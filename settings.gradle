@@ -1,0 +1,2 @@
+rootProject.name='Desert Bus for Hope Widget'
+include ':app'
