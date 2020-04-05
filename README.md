@@ -1,2 +1,5 @@
 # dbwidget
-Desert Bus for Hope Android Widget
+
+An Android home screen widget for Desert Bus For Hope
+
+More details to follow.
