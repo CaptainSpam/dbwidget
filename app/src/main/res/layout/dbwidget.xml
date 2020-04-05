@@ -7,12 +7,13 @@
 
     <ImageView
         android:id="@+id/banner"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:alpha=".5"
-        android:contentDescription="@string/acc_banner" />
+        android:contentDescription="@string/acc_banner"
+        android:scaleType="fitStart" />
 
     <LinearLayout
         android:id="@+id/data"
