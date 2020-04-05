@@ -5,4 +5,10 @@
     <color name="colorAccent">#03DAC5</color>
 
     <color name="text">#fff</color>
+
+    <color name="background_dawnguard">#ef8131</color>
+    <color name="background_alphaflight">#b1222a</color>
+    <color name="background_nightwatch">#1574b7</color>
+    <color name="background_zetashift">#603987</color>
+    <color name="background_omegashift">#000000</color>
 </resources>
