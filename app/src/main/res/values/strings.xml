@@ -2,4 +2,6 @@
     <string name="app_name">Desert Bus for Hope Widget</string>
     <string name="hours_bussed">%1$s of %2$d hours bussed</string>
     <string name="to_next_hour">%1$s to next hour</string>
+
+    <string name="acc_banner">Shift banner</string>
 </resources>
