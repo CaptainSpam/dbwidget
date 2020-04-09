@@ -2,6 +2,7 @@ package net.exclaimindustries.dbwidget
 
 import android.content.Context
 import android.content.Intent
+import android.os.Bundle
 import android.util.Log
 import androidx.core.app.JobIntentService
 import cz.msebera.android.httpclient.client.methods.HttpGet
@@ -30,6 +31,20 @@ class DataFetchService : JobIntentService() {
 
         /** The job's service ID. */
         private const val SERVICE_JOB_ID = 2001
+
+        /** Action name for fetching data. */
+        const val ACTION_FETCH_DATA = "net.exclaimindustries.dbwidget.FETCH_DATA"
+
+        /** Action name for the response broadcast. */
+        const val ACTION_FETCH_RESPONSE = "net.exclaimindustries.dbwidget.FETCH_RESPONSE"
+
+        const val EXTRA_STUFF = "net.exclaimindustries.dbwidget.EXTRA_STUFF"
+        const val EXTRA_CURRENT_DONATIONS =
+            "net.exclaimindustries.dbwidget.EXTRA_CURRENT_DONATIONS"
+        const val EXTRA_RUN_START = "net.exclaimindustries.dbwidget.EXTRA_RUN_START"
+        const val EXTRA_TOTAL_HOURS = "net.exclaimindustries.dbwidget.EXTRA_TOTAL_HOURS"
+        const val EXTRA_COST_TO_NEXT_HOUR =
+            "net.exclaimindustries.dbwidget.EXTRA_COST_TO_NEXT_HOUR"
 
         /** Convenience method for enqueuing work in to this service. */
         fun enqueueWork(context: Context, work: Intent) {
@@ -78,13 +93,6 @@ class DataFetchService : JobIntentService() {
         }
     }
 
-    data class Data(
-        val currentDonations: Double,
-        val runStartTime: Date,
-        val totalHours: Int,
-        val costToNextHour: Double
-    )
-
     override fun onHandleWork(intent: Intent) {
         Log.d(DEBUG_TAG, "Welcome to work handling!")
         // TODO: Caching and rate-limiting?
@@ -99,18 +107,13 @@ class DataFetchService : JobIntentService() {
             TODO("Report a problem somehow; maybe another BroadcastIntent?")
         }
 
-        // Massage the data into whatever's needed for display.
-        val toBroadcast = Data(
+        // Massage the data and send it out the door!
+        dispatchIntent(
             currentDonations,
             runStartTime,
             DonationConverter.totalHoursForDonationAmount(currentDonations),
             DonationConverter.toNextHourFromDonationAmount(currentDonations)
         )
-
-        Log.d(DEBUG_TAG, "Data: $toBroadcast")
-
-        // Then send it out the door!
-        TODO("Set up the BroadcastIntent")
     }
 
     private fun fetchCurrentDonations(): Double {
@@ -131,5 +134,27 @@ class DataFetchService : JobIntentService() {
         val startTime = json.getLong("Year Start Actual UNIX Time") * 1000
 
         return Date(startTime)
+    }
+
+    private fun dispatchIntent(
+        currentDonations: Double,
+        runStartTime: Date,
+        totalHours: Int,
+        costToNextHour: Double
+    ) {
+        // Welcome to central Intent dispatch, your official broadcast headquarters.
+        val intent = Intent(ACTION_FETCH_RESPONSE)
+
+        val bun = Bundle()
+        bun.putDouble(EXTRA_CURRENT_DONATIONS, currentDonations)
+        bun.putSerializable(EXTRA_RUN_START, runStartTime)
+        bun.putInt(EXTRA_TOTAL_HOURS, totalHours)
+        bun.putDouble(EXTRA_COST_TO_NEXT_HOUR, costToNextHour)
+
+        intent.putExtra(EXTRA_STUFF, bun)
+
+        // And away it goes!
+        Log.d(DEBUG_TAG,"Dispatching intent...")
+        sendBroadcast(intent)
     }
 }
