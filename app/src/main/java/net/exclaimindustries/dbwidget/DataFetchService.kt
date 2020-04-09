@@ -2,7 +2,12 @@ package net.exclaimindustries.dbwidget
 
 import android.content.Context
 import android.content.Intent
+import android.util.Log
 import androidx.core.app.JobIntentService
+import cz.msebera.android.httpclient.client.methods.HttpGet
+import cz.msebera.android.httpclient.impl.client.BasicResponseHandler
+import cz.msebera.android.httpclient.impl.client.HttpClientBuilder
+import org.json.JSONArray
 import java.util.*
 
 /**
@@ -12,21 +17,21 @@ import java.util.*
  */
 class DataFetchService : JobIntentService() {
     companion object {
+        private const val debugTag = "DataFetchService"
+
         /** URL to get the current donation total. */
         private const val currentTotalUrl = "https://vst.ninja/milestones/latestTotal"
+
         /**
          * The year of the first Desert Bus for Hope, for the purposes of calculating the current
          * numbered Desert Bus.
          */
         private const val firstDesertBus = 2007
-        /**
-         * The job's service ID.
-         */
+
+        /** The job's service ID. */
         private const val serviceJobId = 2001
 
-        /**
-         * Convenience method for enqueuing work in to this service.
-         */
+        /** Convenience method for enqueuing work in to this service. */
         fun enqueueWork(context: Context, work: Intent) {
             enqueueWork(
                 context,
@@ -52,7 +57,7 @@ class DataFetchService : JobIntentService() {
          *
          * @param year the year to use, or null for today's year
          */
-        private fun getStatsUrl(year: Int?): String {
+        private fun getStatsUrl(year: Int? = null): String {
             val actualYear = if (year === null) {
                 val now = Calendar.getInstance()
                 if (now.get(Calendar.MONTH) < Calendar.NOVEMBER) {
@@ -73,7 +78,58 @@ class DataFetchService : JobIntentService() {
         }
     }
 
+    data class Data(
+        val currentDonations: Double,
+        val runStartTime: Date,
+        val totalHours: Int,
+        val costToNextHour: Double
+    )
+
     override fun onHandleWork(intent: Intent) {
-        // TODO: Do we need to read anything from the intent?
+        Log.d(debugTag, "Welcome to work handling!")
+        // TODO: Caching and rate-limiting?
+        // Hello!  We're on a separate thread now!  Isn't that convenient?
+        val currentDonations: Double
+        val runStartTime: Date
+        try {
+            currentDonations = fetchCurrentDonations()
+            runStartTime = fetchRunStartTime()
+        } catch (e: Exception) {
+            Log.e(debugTag, "Exception when fetching data:", e)
+            TODO("Report a problem somehow; maybe another BroadcastIntent?")
+        }
+
+        // Massage the data into whatever's needed for display.
+        val toBroadcast = Data(
+            currentDonations,
+            runStartTime,
+            DonationConverter.totalHoursForDonationAmount(currentDonations),
+            DonationConverter.toNextHourFromDonationAmount(currentDonations)
+        )
+
+        Log.d(debugTag, "Data: $toBroadcast")
+
+        // Then send it out the door!
+        TODO("Set up the BroadcastIntent")
+    }
+
+    private fun fetchCurrentDonations(): Double {
+        // If something throws here, we'll just let onHandleWork handle it.
+        val httpClient = HttpClientBuilder.create().build()
+        val httpGet = HttpGet(currentTotalUrl)
+        val handler = BasicResponseHandler()
+        return httpClient.execute(httpGet, handler).toDouble()
+    }
+
+    private fun fetchRunStartTime(): Date {
+        // Same thing, just with more potential for parsing errors...
+        val httpClient = HttpClientBuilder.create().build()
+        val httpGet = HttpGet(getStatsUrl())
+        val handler = BasicResponseHandler()
+        // ...because THIS time, it's JSON!
+        val json = JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
+        val startTime = json.getLong("Year Start Actual UNIX Time") * 1000
+
+        return Date(startTime)
     }
 }

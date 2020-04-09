@@ -1,5 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="net.exclaimindustries.dbwidget">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
 
     <application
         android:allowBackup="true"
@@ -7,24 +12,27 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme">
+        android:theme="@style/AppTheme"
+        tools:ignore="AllowBackup">
 
-        <receiver android:name="net.exclaimindustries.dbwidget.WidgetProvider" >
+        <receiver android:name=".WidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
-            <meta-data android:name="android.appwidget.provider"
+
+            <meta-data
+                android:name="android.appwidget.provider"
                 android:resource="@xml/dbwidget_info" />
         </receiver>
 
-        <activity android:name="net.exclaimindustries.dbwidget.WidgetConfigure"
-            android:label="@string/label_configure"/>
+        <activity
+            android:name=".WidgetConfigure"
+            android:label="@string/label_configure" />
 
         <service
-            android:name="net.exclaimindustries.dbwidget.DataFetchService"
+            android:name=".DataFetchService"
+            android:exported="true"
             android:label="@string/label_fetchservice"
-            android:permission="android.permission.BIND_JOB_SERVICE"
-            android:exported="true">
-        </service>
+            android:permission="android.permission.BIND_JOB_SERVICE" />
     </application>
 </manifest>
