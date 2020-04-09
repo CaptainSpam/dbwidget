@@ -24,10 +24,10 @@ class DataFetchService : JobIntentService() {
         private const val CURRENT_TOTAL_URL = "https://vst.ninja/milestones/latestTotal"
 
         /**
-         * The year of the first Desert Bus for Hope, for the purposes of calculating the current
-         * numbered Desert Bus.
+         * The offset used to determine the current numbered Desert Bus.  DB1 was in 2007, meaning
+         * we subtract 2006 from 2007 to get 1, and so on.
          */
-        private const val FIRST_DB_YEAR = 2007
+        private const val DB_YEAR_OFFSET = 2006
 
         /** The job's service ID. */
         private const val SERVICE_JOB_ID = 2001
@@ -77,14 +77,14 @@ class DataFetchService : JobIntentService() {
                 val now = Calendar.getInstance()
                 if (now.get(Calendar.MONTH) < Calendar.NOVEMBER) {
                     // If it's before November, we're likely talking about LAST year's DB run.
-                    now.get(Calendar.YEAR) - FIRST_DB_YEAR - 1
+                    now.get(Calendar.YEAR) - DB_YEAR_OFFSET - 1
                 } else {
                     // If it's November or later, it's likely THIS year's run.
-                    now.get(Calendar.YEAR) - FIRST_DB_YEAR
+                    now.get(Calendar.YEAR) - DB_YEAR_OFFSET
                 }
             } else {
                 // If the year was explicitly given, ignore the month entirely.
-                year - FIRST_DB_YEAR
+                year - DB_YEAR_OFFSET
             }
 
             // The stats URL uses DB labels that are numbered SEQUENTIALLY, not by "official" name
