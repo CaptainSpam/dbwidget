@@ -17,26 +17,26 @@ import java.util.*
  */
 class DataFetchService : JobIntentService() {
     companion object {
-        private const val debugTag = "DataFetchService"
+        private const val DEBUG_TAG = "DataFetchService"
 
         /** URL to get the current donation total. */
-        private const val currentTotalUrl = "https://vst.ninja/milestones/latestTotal"
+        private const val CURRENT_TOTAL_URL = "https://vst.ninja/milestones/latestTotal"
 
         /**
          * The year of the first Desert Bus for Hope, for the purposes of calculating the current
          * numbered Desert Bus.
          */
-        private const val firstDesertBus = 2007
+        private const val FIRST_DB_YEAR = 2007
 
         /** The job's service ID. */
-        private const val serviceJobId = 2001
+        private const val SERVICE_JOB_ID = 2001
 
         /** Convenience method for enqueuing work in to this service. */
         fun enqueueWork(context: Context, work: Intent) {
             enqueueWork(
                 context,
                 DataFetchService::class.java,
-                serviceJobId,
+                SERVICE_JOB_ID,
                 work
             )
         }
@@ -62,14 +62,14 @@ class DataFetchService : JobIntentService() {
                 val now = Calendar.getInstance()
                 if (now.get(Calendar.MONTH) < Calendar.NOVEMBER) {
                     // If it's before November, we're likely talking about LAST year's DB run.
-                    now.get(Calendar.YEAR) - firstDesertBus - 1
+                    now.get(Calendar.YEAR) - FIRST_DB_YEAR - 1
                 } else {
                     // If it's November or later, it's likely THIS year's run.
-                    now.get(Calendar.YEAR) - firstDesertBus
+                    now.get(Calendar.YEAR) - FIRST_DB_YEAR
                 }
             } else {
                 // If the year was explicitly given, ignore the month entirely.
-                year - firstDesertBus
+                year - FIRST_DB_YEAR
             }
 
             // The stats URL uses DB labels that are numbered SEQUENTIALLY, not by "official" name
@@ -86,7 +86,7 @@ class DataFetchService : JobIntentService() {
     )
 
     override fun onHandleWork(intent: Intent) {
-        Log.d(debugTag, "Welcome to work handling!")
+        Log.d(DEBUG_TAG, "Welcome to work handling!")
         // TODO: Caching and rate-limiting?
         // Hello!  We're on a separate thread now!  Isn't that convenient?
         val currentDonations: Double
@@ -95,7 +95,7 @@ class DataFetchService : JobIntentService() {
             currentDonations = fetchCurrentDonations()
             runStartTime = fetchRunStartTime()
         } catch (e: Exception) {
-            Log.e(debugTag, "Exception when fetching data:", e)
+            Log.e(DEBUG_TAG, "Exception when fetching data:", e)
             TODO("Report a problem somehow; maybe another BroadcastIntent?")
         }
 
@@ -107,7 +107,7 @@ class DataFetchService : JobIntentService() {
             DonationConverter.toNextHourFromDonationAmount(currentDonations)
         )
 
-        Log.d(debugTag, "Data: $toBroadcast")
+        Log.d(DEBUG_TAG, "Data: $toBroadcast")
 
         // Then send it out the door!
         TODO("Set up the BroadcastIntent")
@@ -116,7 +116,7 @@ class DataFetchService : JobIntentService() {
     private fun fetchCurrentDonations(): Double {
         // If something throws here, we'll just let onHandleWork handle it.
         val httpClient = HttpClientBuilder.create().build()
-        val httpGet = HttpGet(currentTotalUrl)
+        val httpGet = HttpGet(CURRENT_TOTAL_URL)
         val handler = BasicResponseHandler()
         return httpClient.execute(httpGet, handler).toDouble()
     }

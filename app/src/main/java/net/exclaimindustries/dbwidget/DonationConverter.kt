@@ -11,7 +11,7 @@ import kotlin.math.pow
  */
 class DonationConverter {
     companion object {
-        private const val debugTag = "DonationConverter"
+        private const val DEBUG_TAG = "DonationConverter"
 
         /**
          * List of donation totals needed for each hour.  At time of writing, this holds enough data
@@ -19,7 +19,7 @@ class DonationConverter {
          * exist in this list, chances are we don't need to be really accurate, so we fall back to
          * floating point math.
          */
-        private val hourThresholds = arrayOf(
+        private val HOUR_THRESHOLDS = arrayOf(
             1.00,
             2.07,
             3.21,
@@ -209,7 +209,7 @@ class DonationConverter {
             val map = TreeMap<Double, Int>()
 
             var hour = 1
-            for (donation in hourThresholds) {
+            for (donation in HOUR_THRESHOLDS) {
                 map[donation] = hour
                 hour++
             }
@@ -217,7 +217,7 @@ class DonationConverter {
             return map
         }
 
-        private val hourMap = makeHourMap()
+        private val HOUR_MAP = makeHourMap()
 
         /**
          * Calculates the total hours that will be bussed given the donation total.  This returns an
@@ -230,8 +230,8 @@ class DonationConverter {
             // Due to wackiness involving floating point values, we're using a lookup table.
             if (current >= 3405112.42) {
                 Log.w(
-                    debugTag,
-                    "Donations of \$${current} shoot past ${hourThresholds.size} hours and thus the end of the lookup table, so this may not be accurate..."
+                    DEBUG_TAG,
+                    "Donations of \$${current} shoot past ${HOUR_THRESHOLDS.size} hours and thus the end of the lookup table, so this may not be accurate..."
                 )
                 // ...unless we've shot past the table, in which case we're going to guess and it
                 // likely won't be accurate (see aforementioned wackiness involving floating point
@@ -239,7 +239,7 @@ class DonationConverter {
                 return floor(log10(1 + 0.07 * current) / log10(1.07)).toInt()
             }
 
-            val entry = hourMap.floorEntry(current)
+            val entry = HOUR_MAP.floorEntry(current)
             if (entry === null)
                 return 0
             return entry.value
@@ -264,7 +264,7 @@ class DonationConverter {
          * @return the amount needed for the next hour
          */
         fun toNextHourFromDonationAmount(current: Double): Double {
-            var entry = hourMap.ceilingEntry(current)
+            var entry = HOUR_MAP.ceilingEntry(current)
 
             if (entry === null) {
                 // The entry will be null if we've sailed past the end of the lookup table.  If so,
@@ -278,7 +278,7 @@ class DonationConverter {
                 // If we're EXACTLY at the hour, try again with the next hour.  If the amount came
                 // back as less than the hour, we might be dealing with floating point shenanigans,
                 // so try again with the next hour anyway by bumping up the donations.
-                entry = hourMap.ceilingEntry(current + 0.10)
+                entry = HOUR_MAP.ceilingEntry(current + 0.10)
 
                 if (entry === null) {
                     // Same fallback, just with an extra hour tacked on.
