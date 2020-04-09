@@ -4,6 +4,7 @@ import android.util.Log
 import java.util.*
 import kotlin.math.floor
 import kotlin.math.log10
+import kotlin.math.pow
 
 /**
  * Various static convenience methods for converting donations into hours.
@@ -12,7 +13,12 @@ class DonationConverter {
     companion object {
         private const val debugTag = "DonationConverter"
 
-        /** List of donation totals needed for each hour. */
+        /**
+         * List of donation totals needed for each hour.  At time of writing, this holds enough data
+         * for 182 hours of bussing, which is way more than has ever been bussed.  If it doesn't
+         * exist in this list, chances are we don't need to be really accurate, so we fall back to
+         * floating point math.
+         */
         private val hourThresholds = arrayOf(
             1.00,
             2.07,
@@ -220,7 +226,7 @@ class DonationConverter {
          * @param current the donation total
          * @return the number of whole hours to be bussed
          */
-        fun calculateTotalHours(current: Double): Int {
+        fun totalHoursForDonationAmount(current: Double): Int {
             // Due to wackiness involving floating point values, we're using a lookup table.
             if (current >= 3405112.42) {
                 Log.w(
@@ -239,29 +245,50 @@ class DonationConverter {
             return entry.value
         }
 
+        private fun calculateTotalNeededForHour(hour: Int): Double {
+            return ((1 - 1.07.pow(hour)) / .07) * -1
+        }
+
+        private fun calculateAmountNeededToNextHour(hour: Int): Double {
+            return 1.07.pow(hour)
+        }
+
         /**
          * Calculates the amount of donations needed for the next hour.  This should not return
-         * zero; if Team Order has succeeded in bringing the total to exactly the amount needed for
-         * an hour, this will return the NEXT hour's requirement.
+         * zero in most cases; if Team Order has succeeded in bringing the total to exactly the
+         * amount needed for an hour, this should return the NEXT hour's requirement.  However,
+         * owing to floating point goofiness, at high enough values it may return inaccurate
+         * results, including zero.
          *
          * @param current the current donation total
          * @return the amount needed for the next hour
          */
-        fun calculateToNextHour(current:Double): Double {
+        fun toNextHourFromDonationAmount(current: Double): Double {
             var entry = hourMap.ceilingEntry(current)
-            if(entry === null) {
-                TODO("Need the formula for finding hour X's donation amount")
+
+            if (entry === null) {
+                // The entry will be null if we've sailed past the end of the lookup table.  If so,
+                // fall back to floating point math.
+                return calculateTotalNeededForHour(totalHoursForDonationAmount(current) + 1) - current
             }
 
-            if(entry.key == current) {
-                // If we're EXACTLY at the hour, try again with the next hour.
+            var amount = entry.key
+
+            if (amount <= current) {
+                // If we're EXACTLY at the hour, try again with the next hour.  If the amount came
+                // back as less than the hour, we might be dealing with floating point shenanigans,
+                // so try again with the next hour anyway by bumping up the donations.
                 entry = hourMap.ceilingEntry(current + 0.10)
-                if(entry === null) {
-                    TODO("Need the formula for finding hour X's donation amount")
+
+                if (entry === null) {
+                    // Same fallback, just with an extra hour tacked on.
+                    return calculateTotalNeededForHour(totalHoursForDonationAmount(current) + 2) - current
                 }
+
+                amount = entry.key
             }
 
-            return entry.key - current
+            return amount - current
         }
     }
 }
