@@ -8,7 +8,7 @@ import androidx.core.app.JobIntentService
 import cz.msebera.android.httpclient.client.methods.HttpGet
 import cz.msebera.android.httpclient.impl.client.BasicResponseHandler
 import cz.msebera.android.httpclient.impl.client.HttpClientBuilder
-import net.exclaimindustries.dbwidget.tools.DonationConverter
+import net.exclaimindustries.dbwidget.util.DonationConverter
 import org.json.JSONArray
 import java.util.*
 

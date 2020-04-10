@@ -1,4 +1,4 @@
-package net.exclaimindustries.dbwidget.tools
+package net.exclaimindustries.dbwidget.util
 
 import android.util.Log
 import java.util.*
