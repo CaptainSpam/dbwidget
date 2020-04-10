@@ -302,7 +302,7 @@ class DonationConverter {
          */
         fun totalHoursForDonationAmount(current: Double): Int {
             // Due to wackiness involving floating point values, we're using a lookup table.
-            if (current >= 3405112.42) {
+            if (current >= HOUR_THRESHOLDS[HOUR_THRESHOLDS.size - 1]) {
                 Log.w(
                     DEBUG_TAG,
                     "Donations of \$${current} shoot past ${HOUR_THRESHOLDS.size} hours and thus the end of the lookup table, so this may not be accurate..."
