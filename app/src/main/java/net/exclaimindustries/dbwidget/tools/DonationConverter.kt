@@ -1,4 +1,4 @@
-package net.exclaimindustries.dbwidget
+package net.exclaimindustries.dbwidget.tools
 
 import android.util.Log
 import java.util.*
@@ -269,7 +269,11 @@ class DonationConverter {
             if (entry === null) {
                 // The entry will be null if we've sailed past the end of the lookup table.  If so,
                 // fall back to floating point math.
-                return calculateTotalNeededForHour(totalHoursForDonationAmount(current) + 1) - current
+                return calculateTotalNeededForHour(
+                    totalHoursForDonationAmount(
+                        current
+                    ) + 1
+                ) - current
             }
 
             var amount = entry.key
@@ -282,7 +286,11 @@ class DonationConverter {
 
                 if (entry === null) {
                     // Same fallback, just with an extra hour tacked on.
-                    return calculateTotalNeededForHour(totalHoursForDonationAmount(current) + 2) - current
+                    return calculateTotalNeededForHour(
+                        totalHoursForDonationAmount(
+                            current
+                        ) + 2
+                    ) - current
                 }
 
                 amount = entry.key

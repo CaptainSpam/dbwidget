@@ -26,11 +26,11 @@
         </receiver>
 
         <activity
-            android:name=".WidgetConfigure"
+            android:name=".activities.WidgetConfigure"
             android:label="@string/label_configure" />
 
         <service
-            android:name=".DataFetchService"
+            android:name=".services.DataFetchService"
             android:exported="true"
             android:label="@string/label_fetchservice"
             android:permission="android.permission.BIND_JOB_SERVICE" />
