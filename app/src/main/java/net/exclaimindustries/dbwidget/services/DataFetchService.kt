@@ -2,9 +2,9 @@ package net.exclaimindustries.dbwidget.services
 
 import android.content.Context
 import android.content.Intent
-import android.os.Bundle
 import android.util.Log
 import androidx.core.app.JobIntentService
+import androidx.lifecycle.LiveData
 import cz.msebera.android.httpclient.client.methods.HttpGet
 import cz.msebera.android.httpclient.impl.client.BasicResponseHandler
 import cz.msebera.android.httpclient.impl.client.HttpClientBuilder
@@ -37,20 +37,6 @@ class DataFetchService : JobIntentService() {
 
         /** Action name for fetching data. */
         const val ACTION_FETCH_DATA = "net.exclaimindustries.dbwidget.FETCH_DATA"
-
-        /** Action name for the response broadcast. */
-        const val ACTION_FETCH_RESPONSE = "net.exclaimindustries.dbwidget.FETCH_RESPONSE"
-
-        const val EXTRA_STUFF = "net.exclaimindustries.dbwidget.EXTRA_STUFF"
-        const val EXTRA_CURRENT_DONATIONS =
-            "net.exclaimindustries.dbwidget.EXTRA_CURRENT_DONATIONS"
-        const val EXTRA_RUN_START = "net.exclaimindustries.dbwidget.EXTRA_RUN_START"
-        const val EXTRA_TOTAL_HOURS = "net.exclaimindustries.dbwidget.EXTRA_TOTAL_HOURS"
-        const val EXTRA_COST_TO_NEXT_HOUR =
-            "net.exclaimindustries.dbwidget.EXTRA_COST_TO_NEXT_HOUR"
-
-        const val EXTRA_ERROR_CODE = "net.exclaimindustries.dbwidget.EXTRA_ERROR_CODE"
-        const val EXTRA_EXCEPTION = "net.exclaimindustries.dbwidget.EXTRA_EXCEPTION"
 
         const val ERROR_GENERAL = 1
         const val ERROR_NO_NETWORK = 2
@@ -100,6 +86,30 @@ class DataFetchService : JobIntentService() {
             // (that is, the Desert Bus that happened in 2017 is DB11, not DB2017).
             return "https://vst.ninja/DB${actualYear}/data/DB${actualYear}_stats.json"
         }
+
+        /** A result from a data fetch. */
+        sealed class ResultEvent {
+            /** All is well, results are included. */
+            data class Success(
+                val currentDonations: Double,
+                val runStartTime: Date,
+                val totalHours: Int,
+                val costToNextHour: Double
+            ) : ResultEvent()
+
+            /** There's no network connection. */
+            data class ErrorNoConnection(val e: Exception?) : ResultEvent()
+
+            /** There was some sort of error not covered otherwise. */
+            data class ErrorGeneral(val e: Exception?) : ResultEvent()
+        }
+
+        /** A LiveData subscribable thingamajig for results. */
+        object ResultEventLiveData : LiveData<ResultEvent>() {
+            internal fun notify(result: ResultEvent) {
+                postValue(result)
+            }
+        }
     }
 
     private var networkIsUp = false
@@ -136,7 +146,7 @@ class DataFetchService : JobIntentService() {
         }
 
         // Massage the data and send it out the door!
-        dispatchIntent(
+        dispatchData(
             currentDonations,
             runStartTime,
             DonationConverter.totalHoursForDonationAmount(currentDonations),
@@ -164,37 +174,31 @@ class DataFetchService : JobIntentService() {
         return Date(startTime)
     }
 
-    private fun dispatchIntent(
+    private fun dispatchData(
         currentDonations: Double,
         runStartTime: Date,
         totalHours: Int,
         costToNextHour: Double
     ) {
-        // Welcome to central Intent dispatch, your official broadcast headquarters.
-        val intent = Intent(ACTION_FETCH_RESPONSE)
-
-        val bun = Bundle()
-        bun.putDouble(EXTRA_CURRENT_DONATIONS, currentDonations)
-        bun.putSerializable(EXTRA_RUN_START, runStartTime)
-        bun.putInt(EXTRA_TOTAL_HOURS, totalHours)
-        bun.putDouble(EXTRA_COST_TO_NEXT_HOUR, costToNextHour)
-
-        intent.putExtra(EXTRA_STUFF, bun)
-
-        // And away it goes!
-        Log.d(DEBUG_TAG, "Dispatching intent...")
-        sendBroadcast(intent)
+        // Welcome to central LiveData dispatch, your official broadcast headquarters.
+        Log.d(DEBUG_TAG, "Dispatching data...")
+        ResultEventLiveData.notify(
+            ResultEvent.Success(
+                currentDonations,
+                runStartTime,
+                totalHours,
+                costToNextHour
+            )
+        )
     }
 
     private fun dispatchError(errorCode: Int, exception: Exception? = null) {
-        // Welcome to central Intent dispatch's failure wing.
-        val intent = Intent(ACTION_FETCH_RESPONSE)
-
-        intent.putExtra(EXTRA_ERROR_CODE, errorCode)
-        if (exception !== null)
-            intent.putExtra(EXTRA_EXCEPTION, exception)
-
-        Log.d(DEBUG_TAG, "Dispatching error intent for error code $errorCode...")
-        sendBroadcast(intent)
+        // Welcome to central LiveData dispatch's failure wing.
+        Log.d(DEBUG_TAG, "Dispatching data for error code $errorCode...")
+        ResultEventLiveData.notify(
+            if (errorCode == ERROR_NO_NETWORK) ResultEvent.ErrorNoConnection(
+                exception
+            ) else ResultEvent.ErrorGeneral(exception)
+        )
     }
 }
