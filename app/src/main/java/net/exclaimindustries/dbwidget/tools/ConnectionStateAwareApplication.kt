@@ -3,6 +3,7 @@ package net.exclaimindustries.dbwidget.tools
 import android.app.Application
 import android.content.Context
 import android.net.*
+import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
 import androidx.lifecycle.LiveData
 
 /**
@@ -53,8 +54,9 @@ class ConnectionStateAwareApplication : Application() {
         val connectivityManager =
             getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+        // Register the callback and hope for the best!
         connectivityManager.registerNetworkCallback(
-            NetworkRequest.Builder().build(),
+            NetworkRequest.Builder().addCapability(NET_CAPABILITY_INTERNET).build(),
             ApplicationNetworkCallback()
         )
     }
