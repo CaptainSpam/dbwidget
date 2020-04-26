@@ -8,6 +8,8 @@ import androidx.core.app.JobIntentService
 import cz.msebera.android.httpclient.client.methods.HttpGet
 import cz.msebera.android.httpclient.impl.client.BasicResponseHandler
 import cz.msebera.android.httpclient.impl.client.HttpClientBuilder
+import net.exclaimindustries.dbwidget.tools.ConnectionStateAwareApplication.Companion.ConnectivityEvent
+import net.exclaimindustries.dbwidget.tools.ConnectionStateAwareApplication.Companion.ConnectivityEventLiveData
 import net.exclaimindustries.dbwidget.util.DonationConverter
 import org.json.JSONArray
 import java.util.*
@@ -46,6 +48,12 @@ class DataFetchService : JobIntentService() {
         const val EXTRA_TOTAL_HOURS = "net.exclaimindustries.dbwidget.EXTRA_TOTAL_HOURS"
         const val EXTRA_COST_TO_NEXT_HOUR =
             "net.exclaimindustries.dbwidget.EXTRA_COST_TO_NEXT_HOUR"
+
+        const val EXTRA_ERROR_CODE = "net.exclaimindustries.dbwidget.EXTRA_ERROR_CODE"
+        const val EXTRA_EXCEPTION = "net.exclaimindustries.dbwidget.EXTRA_EXCEPTION"
+
+        const val ERROR_GENERAL = 1
+        const val ERROR_NO_NETWORK = 2
 
         /** Convenience method for enqueuing work in to this service. */
         fun enqueueWork(context: Context, work: Intent) {
@@ -94,6 +102,24 @@ class DataFetchService : JobIntentService() {
         }
     }
 
+    private var networkIsUp = false
+    private val networkStateObserver =
+        androidx.lifecycle.Observer<ConnectivityEvent> { event ->
+            networkIsUp = event is ConnectivityEvent.ConnectivityAvailable
+        }
+
+    override fun onCreate() {
+        super.onCreate()
+
+        ConnectivityEventLiveData.observeForever(networkStateObserver)
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        ConnectivityEventLiveData.removeObserver(networkStateObserver)
+    }
+
     override fun onHandleWork(intent: Intent) {
         Log.d(DEBUG_TAG, "Welcome to work handling!")
         // TODO: Caching and rate-limiting?
@@ -105,7 +131,8 @@ class DataFetchService : JobIntentService() {
             runStartTime = fetchRunStartTime()
         } catch (e: Exception) {
             Log.e(DEBUG_TAG, "Exception when fetching data:", e)
-            TODO("Report a problem somehow; maybe another BroadcastIntent?")
+            dispatchError(if (!networkIsUp) ERROR_NO_NETWORK else ERROR_GENERAL, e)
+            return
         }
 
         // Massage the data and send it out the door!
@@ -155,7 +182,19 @@ class DataFetchService : JobIntentService() {
         intent.putExtra(EXTRA_STUFF, bun)
 
         // And away it goes!
-        Log.d(DEBUG_TAG,"Dispatching intent...")
+        Log.d(DEBUG_TAG, "Dispatching intent...")
+        sendBroadcast(intent)
+    }
+
+    private fun dispatchError(errorCode: Int, exception: Exception? = null) {
+        // Welcome to central Intent dispatch's failure wing.
+        val intent = Intent(ACTION_FETCH_RESPONSE)
+
+        intent.putExtra(EXTRA_ERROR_CODE, errorCode)
+        if (exception !== null)
+            intent.putExtra(EXTRA_EXCEPTION, exception)
+
+        Log.d(DEBUG_TAG, "Dispatching error intent for error code $errorCode...")
         sendBroadcast(intent)
     }
 }

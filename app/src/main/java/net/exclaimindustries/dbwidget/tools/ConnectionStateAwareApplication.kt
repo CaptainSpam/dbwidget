@@ -17,7 +17,9 @@ class ConnectionStateAwareApplication : Application() {
     companion object {
         /** Enum of connectivity data.  Subject to change for any reason. */
         sealed class ConnectivityEvent {
+            /** Connectivity was just lost for the given Network. */
             data class ConnectivityLost(val network: Network) : ConnectivityEvent()
+            /** Connectivity is now available for the given Network. */
             data class ConnectivityAvailable(val network: Network) : ConnectivityEvent()
         }
 
