@@ -35,6 +35,12 @@ class DataFetchService : JobIntentService() {
         /** The job's service ID. */
         private const val SERVICE_JOB_ID = 2001
 
+        /**
+         * The amount of time the data is considered to still be fresh enough to be returned, in
+         * millis.  Currently 60 seconds.
+         */
+        private const val DATA_CACHE_TIME_MILLIS = 60000L
+
         /** Action name for fetching data. */
         const val ACTION_FETCH_DATA = "net.exclaimindustries.dbwidget.FETCH_DATA"
 
@@ -87,24 +93,60 @@ class DataFetchService : JobIntentService() {
             return "https://vst.ninja/DB${actualYear}/data/DB${actualYear}_stats.json"
         }
 
+        /** The data from a successful fetch. */
+        data class ResultData(
+            /**
+             * The current donation amount, as a Double.
+             *
+             * TODO: Consider making a Long or String instead?  Precision is always two digits, and
+             * though it's highly unlikely DB will reach high enough to mess up a Double's accuracy,
+             * defensive coding is still a Good Thing™.
+             */
+            val currentDonations: Double,
+            /** The start time of the current run, in millis. */
+            val runStartTimeMillis: Long,
+            /**
+             * The total hours that will be run with the given donations.  Use this with
+             * runStartTimeMillis (with some flex to account for Omega Shift and the thank-you hour)
+             * to guess if the run is still going on.
+             */
+            val totalHours: Int,
+            /**
+             * The donations needed to reach the next hour.
+             *
+             * TODO: Same thing as with currentDonations.
+             */
+            val costToNextHour: Double,
+            /** When this data was fetched, in millis.  Used for cache purposes. */
+            val fetchedAtMillis: Long
+        )
+
         /** A result from a data fetch. */
         sealed class ResultEvent {
+            /**
+             * Either the live data, the last-known or cached data, or null if we haven't been able
+             * to fetch any data yet.
+             */
+            abstract val data: ResultData?
             /** All is well, results are included. */
-            data class Success(
-                val currentDonations: Double,
-                val runStartTime: Date,
-                val totalHours: Int,
-                val costToNextHour: Double
+            data class Fetched(override val data: ResultData) : ResultEvent()
+            /** The last-known data was new enough, so that was returned instead. */
+            data class Cached(override val data: ResultData) : ResultEvent()
+            /** There's no network connection, last-known results are included. */
+            data class ErrorNoConnection(
+                override val data: ResultData?,
+                val exception: Exception?
             ) : ResultEvent()
-
-            /** There's no network connection. */
-            data class ErrorNoConnection(val e: Exception?) : ResultEvent()
-
-            /** There was some sort of error not covered otherwise. */
-            data class ErrorGeneral(val e: Exception?) : ResultEvent()
+            /**
+             * There was some sort of error not covered otherwise, last-known results are included.
+             */
+            data class ErrorGeneral(
+                override val data: ResultData?,
+                val exception: Exception?
+            ) : ResultEvent()
         }
 
-        /** A LiveData subscribable thingamajig for results. */
+        /** A LiveData observable thingamajig for results. */
         object ResultEventLiveData : LiveData<ResultEvent>() {
             internal fun notify(result: ResultEvent) {
                 postValue(result)
@@ -131,11 +173,18 @@ class DataFetchService : JobIntentService() {
     }
 
     override fun onHandleWork(intent: Intent) {
-        Log.d(DEBUG_TAG, "Welcome to work handling!")
-        // TODO: Caching and rate-limiting?
         // Hello!  We're on a separate thread now!  Isn't that convenient?
+        Log.d(DEBUG_TAG, "Welcome to work handling!")
+
+        val lastKnownData = ResultEventLiveData.value?.data
+        if (lastKnownData !== null && (Date().time - lastKnownData.fetchedAtMillis < DATA_CACHE_TIME_MILLIS)) {
+            // The cached data is still new enough, return that immediately.
+            dispatchCachedData(lastKnownData)
+            return
+        }
+
         val currentDonations: Double
-        val runStartTime: Date
+        val runStartTime: Long
         try {
             currentDonations = fetchCurrentDonations()
             runStartTime = fetchRunStartTime()
@@ -162,43 +211,52 @@ class DataFetchService : JobIntentService() {
         return httpClient.execute(httpGet, handler).toDouble()
     }
 
-    private fun fetchRunStartTime(): Date {
+    private fun fetchRunStartTime(): Long {
         // Same thing, just with more potential for parsing errors...
         val httpClient = HttpClientBuilder.create().build()
         val httpGet = HttpGet(getStatsUrl())
         val handler = BasicResponseHandler()
         // ...because THIS time, it's JSON!
         val json = JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
-        val startTime = json.getLong("Year Start Actual UNIX Time") * 1000
 
-        return Date(startTime)
+        return json.getLong("Year Start Actual UNIX Time") * 1000
     }
 
     private fun dispatchData(
         currentDonations: Double,
-        runStartTime: Date,
+        runStartTime: Long,
         totalHours: Int,
         costToNextHour: Double
     ) {
         // Welcome to central LiveData dispatch, your official broadcast headquarters.
         Log.d(DEBUG_TAG, "Dispatching data...")
         ResultEventLiveData.notify(
-            ResultEvent.Success(
-                currentDonations,
-                runStartTime,
-                totalHours,
-                costToNextHour
+            ResultEvent.Fetched(
+                ResultData(
+                    currentDonations,
+                    runStartTime,
+                    totalHours,
+                    costToNextHour,
+                    Date().time
+                )
             )
         )
+    }
+
+    private fun dispatchCachedData(resultData: ResultData) {
+        // Welcome to central LiveData dispatch's cache annex.
+        Log.d(DEBUG_TAG, "Dispatching cached data...")
+        ResultEventLiveData.notify(ResultEvent.Cached(resultData))
     }
 
     private fun dispatchError(errorCode: Int, exception: Exception? = null) {
         // Welcome to central LiveData dispatch's failure wing.
         Log.d(DEBUG_TAG, "Dispatching data for error code $errorCode...")
         ResultEventLiveData.notify(
-            if (errorCode == ERROR_NO_NETWORK) ResultEvent.ErrorNoConnection(
-                exception
-            ) else ResultEvent.ErrorGeneral(exception)
+            if (errorCode == ERROR_NO_NETWORK)
+                ResultEvent.ErrorNoConnection(ResultEventLiveData.value?.data,exception)
+            else
+                ResultEvent.ErrorGeneral(ResultEventLiveData.value?.data, exception)
         )
     }
 }
