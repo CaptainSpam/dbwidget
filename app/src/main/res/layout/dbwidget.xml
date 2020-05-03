@@ -22,6 +22,7 @@
         android:layout_alignParentEnd="true"
         android:layout_centerInParent="false"
         android:layout_centerVertical="true"
+        android:layout_marginEnd="@dimen/data_block_margin"
         android:orientation="vertical">
 
         <TextView
