@@ -1,4 +1,4 @@
-package net.exclaimindustries.dbwidget
+package net.exclaimindustries.dbwidget.widgets
 
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -8,6 +8,7 @@ import android.os.Build
 import android.widget.RemoteViews
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import net.exclaimindustries.dbwidget.R
 import java.util.*
 
 class WidgetProvider : AppWidgetProvider() {
@@ -30,11 +31,11 @@ class WidgetProvider : AppWidgetProvider() {
 
         @DrawableRes
         private fun getShiftDrawable(shift: DBShift): Int = when (shift) {
-            is DBShift.DawnGuard -> R.drawable.dbdawnguard_h
-            is DBShift.AlphaFlight -> R.drawable.dbalphaflight_h
-            is DBShift.NightWatch -> R.drawable.dbnightwatch_h
-            is DBShift.ZetaShift -> R.drawable.dbzetashift_h
-            is DBShift.OmegaShift -> R.drawable.dbomegashift_h
+            is DBShift.DawnGuard -> R.drawable.dbdawnguard
+            is DBShift.AlphaFlight -> R.drawable.dbalphaflight
+            is DBShift.NightWatch -> R.drawable.dbnightwatch
+            is DBShift.ZetaShift -> R.drawable.dbzetashift
+            is DBShift.OmegaShift -> R.drawable.dbomegashift
         }
 
         @ColorRes
@@ -65,7 +66,6 @@ class WidgetProvider : AppWidgetProvider() {
             val views = RemoteViews(context.packageName, R.layout.dbwidget)
             views.setImageViewResource(R.id.banner, getShiftDrawable(shift))
 
-            @Suppress("DEPRECATION")
             views.setInt(
                 R.id.banner,
                 "setBackgroundColor",

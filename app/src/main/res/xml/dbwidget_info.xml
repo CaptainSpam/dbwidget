@@ -3,7 +3,7 @@
     android:minWidth="180dp"
     android:minHeight="40dp"
     android:updatePeriodMillis="0"
-    android:previewImage="@drawable/dbwidgetpreview01"
+    android:previewImage="@drawable/widgetpreview"
     android:initialLayout="@layout/dbwidget"
     android:resizeMode="horizontal"
     android:widgetCategory="home_screen">
