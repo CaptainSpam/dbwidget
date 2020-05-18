@@ -254,7 +254,7 @@ class DataFetchService : JobIntentService() {
         Log.d(DEBUG_TAG, "Dispatching data for error code $errorCode...")
         ResultEventLiveData.notify(
             if (errorCode == ERROR_NO_NETWORK)
-                ResultEvent.ErrorNoConnection(ResultEventLiveData.value?.data,exception)
+                ResultEvent.ErrorNoConnection(ResultEventLiveData.value?.data, exception)
             else
                 ResultEvent.ErrorGeneral(ResultEventLiveData.value?.data, exception)
         )
