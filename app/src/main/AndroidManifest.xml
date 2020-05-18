@@ -27,6 +27,11 @@
                 android:resource="@xml/dbwidget_info" />
         </receiver>
 
+        <receiver android:name=".widgets.WidgetProvider$Companion$AlarmReceiver"
+            android:exported="false"
+            android:enabled="true">
+        </receiver>
+
         <activity
             android:name=".activities.WidgetConfigure"
             android:label="@string/label_configure" />
