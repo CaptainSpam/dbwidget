@@ -98,13 +98,7 @@ class DataFetchService : JobIntentService() {
 
         /** The data from a successful fetch. */
         data class ResultData(
-            /**
-             * The current donation amount, as a Double.
-             *
-             * TODO: Consider making a Long or String instead?  Precision is always two digits, and
-             * though it's highly unlikely DB will reach high enough to mess up a Double's accuracy,
-             * defensive coding is still a Good Thing™.
-             */
+            /** The current donation amount, as a Double. */
             val currentDonations: Double,
             /** The start time of the current run, in millis. */
             val runStartTimeMillis: Long,
@@ -114,11 +108,7 @@ class DataFetchService : JobIntentService() {
              * to guess if the run is still going on.
              */
             val totalHours: Int,
-            /**
-             * The donations needed to reach the next hour.
-             *
-             * TODO: Same thing as with currentDonations.
-             */
+            /** The donations needed to reach the next hour. */
             val costToNextHour: Double,
             /** When this data was fetched, in millis.  Used for cache purposes. */
             val fetchedAtMillis: Long
