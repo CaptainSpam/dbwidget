@@ -47,13 +47,6 @@ class DataFetchService : JobIntentService() {
         /** Broadcast name for fetched data. */
         const val ACTION_DATA_FETCHED = "net.exclaimindustries.dbwidget.DATA_FETCHED"
 
-        const val EXTRA_CURRENT_DONATIONS = "currentDonations"
-        const val EXTRA_RUN_START_TIME_MILLIS = "runStartTimeMillis"
-        const val EXTRA_TOTAL_HOURS = "totalHours"
-        const val EXTRA_COST_TO_NEXT_HOUR = "costToNextHour"
-        const val EXTRA_FETCHED_AT_MILLIS = "fetchedAtMillis"
-        const val EXTRA_ERROR_CODE = "errorCode"
-
         const val ERROR_GENERAL = 1
         const val ERROR_NO_NETWORK = 2
 
@@ -252,16 +245,15 @@ class DataFetchService : JobIntentService() {
         // Update the LiveData; having the last-seen data available on demand is good.
         ResultEventLiveData.notify(ResultEvent.Fetched(result))
 
-        // Then, broadcast an Intent with the same data so that the receivers can have a Context
-        // with which to mess.
-        sendBroadcast(makeIntentFromResult(result))
+        // Then, broadcast an Intent so that the receivers can have a Context with which to mess.
+        broadcastDataFetched()
     }
 
     private fun dispatchCachedData(resultData: ResultData) {
         // Welcome to central dispatch's cache annex.
         Log.d(DEBUG_TAG, "Dispatching cached data...")
         ResultEventLiveData.notify(ResultEvent.Cached(resultData))
-        sendBroadcast(makeIntentFromResult(resultData))
+        broadcastDataFetched()
     }
 
     private fun dispatchError(errorCode: Int, exception: Exception? = null) {
@@ -275,20 +267,13 @@ class DataFetchService : JobIntentService() {
             else
                 ResultEvent.ErrorGeneral(lastData, exception)
         )
-        sendBroadcast(makeErrorIntentFromResult(lastData, errorCode))
+        broadcastDataFetched()
     }
 
-    private fun makeIntentFromResult(result: ResultData): Intent {
-        return Intent(ACTION_DATA_FETCHED)
-            .putExtra(EXTRA_CURRENT_DONATIONS, result.currentDonations)
-            .putExtra(EXTRA_RUN_START_TIME_MILLIS, result.runStartTimeMillis)
-            .putExtra(EXTRA_TOTAL_HOURS, result.totalHours)
-            .putExtra(EXTRA_COST_TO_NEXT_HOUR, result.costToNextHour)
-            .putExtra(EXTRA_FETCHED_AT_MILLIS, result.fetchedAtMillis)
-    }
-
-    private fun makeErrorIntentFromResult(result: ResultData?, errorCode: Int): Intent {
-        return (if (result !== null) makeIntentFromResult(result) else Intent(ACTION_DATA_FETCHED))
-            .putExtra(EXTRA_ERROR_CODE, errorCode)
+    private fun broadcastDataFetched() {
+        // This just lets any broadcast listeners know the LiveData's been updated, which in turn
+        // means it'll be listening in such a way that gives it a Context where LiveData's Observer
+        // doesn't.
+        sendBroadcast(Intent(ACTION_DATA_FETCHED))
     }
 }
