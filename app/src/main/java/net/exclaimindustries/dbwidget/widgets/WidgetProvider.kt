@@ -46,27 +46,52 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         private fun scheduleAlarm(context: Context) {
-            /* TODO: The alarm shouldn't be this simple.  It also needs to account for if it's
-               November or not and schedule appropriately. */
-            Log.d(
-                DEBUG_TAG,
-                "Setting alarm for ${SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS}..."
-            )
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            // We'll use plain alarms and reschedule as needed.  We'll do this primarily because we
-            // DON'T want this to use a wakeup alarm, and we DO want it to be able to drift as need
-            // be.  Excessive checks would be pointless.
-            alarmManager.set(
-                AlarmManager.ELAPSED_REALTIME,
-                SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS,
-                PendingIntent.getBroadcast(
-                    context,
-                    0,
-                    Intent(context, AlarmReceiver::class.java).setAction(CHECK_ALARM_ACTION),
-                    0
+            val cal = Calendar.getInstance()
+
+            if(cal.get(Calendar.MONTH) != Calendar.NOVEMBER) {
+                // If it's NOT November, just schedule a wakeup on the first of November.  Sure, why
+                // not?  Someone might leave their device awake until November.
+                Log.d(DEBUG_TAG, "It's not November; setting something to wake me up when October ends...")
+
+                cal.set(Calendar.MONTH, Calendar.NOVEMBER)
+                cal.set(Calendar.DAY_OF_MONTH, 1)
+                if(cal.get(Calendar.MONTH) == Calendar.DECEMBER) {
+                    // It's December (and thus past November); wait until next year.
+                    cal.add(Calendar.YEAR, 1)
+                }
+
+                alarmManager.set(
+                    AlarmManager.RTC,
+                    cal.timeInMillis,
+                    PendingIntent.getBroadcast(
+                        context,
+                        0,
+                        Intent(context, AlarmReceiver::class.java).setAction(CHECK_ALARM_ACTION),
+                        0
+                    )
                 )
-            )
+            } else {
+                Log.d(
+                    DEBUG_TAG,
+                    "Setting alarm for ${SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS}..."
+                )
+
+                // We'll use plain alarms and reschedule as needed.  We'll do this primarily because
+                // we DON'T want this to use a wakeup alarm, and we DO want it to be able to drift
+                // as need be.  Excessive checks would be pointless.
+                alarmManager.set(
+                    AlarmManager.ELAPSED_REALTIME,
+                    SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS,
+                    PendingIntent.getBroadcast(
+                        context,
+                        0,
+                        Intent(context, AlarmReceiver::class.java).setAction(CHECK_ALARM_ACTION),
+                        0
+                    )
+                )
+            }
         }
 
         private fun cancelAlarm(context: Context) {
