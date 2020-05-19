@@ -44,6 +44,16 @@ class DataFetchService : JobIntentService() {
         /** Action name for fetching data. */
         const val ACTION_FETCH_DATA = "net.exclaimindustries.dbwidget.FETCH_DATA"
 
+        /** Broadcast name for fetched data. */
+        const val ACTION_DATA_FETCHED = "net.exclaimindustries.dbwidget.DATA_FETCHED"
+
+        const val EXTRA_CURRENT_DONATIONS = "currentDonations"
+        const val EXTRA_RUN_START_TIME_MILLIS = "runStartTimeMillis"
+        const val EXTRA_TOTAL_HOURS = "totalHours"
+        const val EXTRA_COST_TO_NEXT_HOUR = "costToNextHour"
+        const val EXTRA_FETCHED_AT_MILLIS = "fetchedAtMillis"
+        const val EXTRA_ERROR_CODE = "errorCode"
+
         const val ERROR_GENERAL = 1
         const val ERROR_NO_NETWORK = 2
 
@@ -228,35 +238,57 @@ class DataFetchService : JobIntentService() {
         totalHours: Int,
         costToNextHour: Double
     ) {
-        // Welcome to central LiveData dispatch, your official broadcast headquarters.
+        // Welcome to central dispatch, your official broadcast headquarters.
         Log.d(DEBUG_TAG, "Dispatching data...")
-        ResultEventLiveData.notify(
-            ResultEvent.Fetched(
-                ResultData(
-                    currentDonations,
-                    runStartTime,
-                    totalHours,
-                    costToNextHour,
-                    Date().time
-                )
-            )
+
+        val result = ResultData(
+            currentDonations,
+            runStartTime,
+            totalHours,
+            costToNextHour,
+            Date().time
         )
+
+        // Update the LiveData; having the last-seen data available on demand is good.
+        ResultEventLiveData.notify(ResultEvent.Fetched(result))
+
+        // Then, broadcast an Intent with the same data so that the receivers can have a Context
+        // with which to mess.
+        sendBroadcast(makeIntentFromResult(result))
     }
 
     private fun dispatchCachedData(resultData: ResultData) {
-        // Welcome to central LiveData dispatch's cache annex.
+        // Welcome to central dispatch's cache annex.
         Log.d(DEBUG_TAG, "Dispatching cached data...")
         ResultEventLiveData.notify(ResultEvent.Cached(resultData))
+        sendBroadcast(makeIntentFromResult(resultData))
     }
 
     private fun dispatchError(errorCode: Int, exception: Exception? = null) {
-        // Welcome to central LiveData dispatch's failure wing.
+        // Welcome to central dispatch's failure wing.
         Log.d(DEBUG_TAG, "Dispatching data for error code $errorCode...")
+        val lastData = ResultEventLiveData.value?.data
+
         ResultEventLiveData.notify(
             if (errorCode == ERROR_NO_NETWORK)
-                ResultEvent.ErrorNoConnection(ResultEventLiveData.value?.data, exception)
+                ResultEvent.ErrorNoConnection(lastData, exception)
             else
-                ResultEvent.ErrorGeneral(ResultEventLiveData.value?.data, exception)
+                ResultEvent.ErrorGeneral(lastData, exception)
         )
+        sendBroadcast(makeErrorIntentFromResult(lastData, errorCode))
+    }
+
+    private fun makeIntentFromResult(result: ResultData): Intent {
+        return Intent(ACTION_DATA_FETCHED)
+            .putExtra(EXTRA_CURRENT_DONATIONS, result.currentDonations)
+            .putExtra(EXTRA_RUN_START_TIME_MILLIS, result.runStartTimeMillis)
+            .putExtra(EXTRA_TOTAL_HOURS, result.totalHours)
+            .putExtra(EXTRA_COST_TO_NEXT_HOUR, result.costToNextHour)
+            .putExtra(EXTRA_FETCHED_AT_MILLIS, result.fetchedAtMillis)
+    }
+
+    private fun makeErrorIntentFromResult(result: ResultData?, errorCode: Int): Intent {
+        return (if (result !== null) makeIntentFromResult(result) else Intent(ACTION_DATA_FETCHED))
+            .putExtra(EXTRA_ERROR_CODE, errorCode)
     }
 }
