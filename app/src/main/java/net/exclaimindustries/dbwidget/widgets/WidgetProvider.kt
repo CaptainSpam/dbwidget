@@ -21,6 +21,7 @@ import androidx.annotation.DrawableRes
 import net.exclaimindustries.dbwidget.R
 import net.exclaimindustries.dbwidget.services.DataFetchService
 import net.exclaimindustries.dbwidget.util.DonationConverter
+import java.text.DecimalFormat
 import java.util.*
 
 class WidgetProvider : AppWidgetProvider() {
@@ -281,7 +282,8 @@ class WidgetProvider : AppWidgetProvider() {
             views.setViewVisibility(R.id.nonfresh_error, View.GONE)
 
             // We always put the current donations up.
-            views.setTextViewText(R.id.current_total, "\$${String.format("%.2f", currentDonations)}")
+            views.setTextViewText(R.id.current_total,
+                "\$${DecimalFormat("###,###,###,###.00").format(currentDonations)}")
 
             if(now.get(Calendar.MONTH) < Calendar.NOVEMBER
                 || now.timeInMillis > endPlusThankYou.timeInMillis) {
