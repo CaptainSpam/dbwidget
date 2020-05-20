@@ -4,7 +4,7 @@
 
     <string name="app_name">Desert Bus for Hope Widget</string>
     <string name="hours_bussed">%1$d of %2$d hours</string>
-    <string name="to_next_hour">$%1$s to next hour</string>
+    <string name="to_next_hour">%1$s to next hour</string>
     <string name="hours_bussed_end">The bus drove for %1$d hours</string>
     <string name="hours_until_bus">The bus departs %1$s…</string>
 

@@ -314,10 +314,11 @@ class WidgetProvider : AppWidgetProvider() {
                     R.id.to_next_hour,
                     context.getString(
                         R.string.to_next_hour,
-                        String.format(
-                            "%.2f",
-                            DonationConverter.toNextHourFromDonationAmount(currentDonations)
-                        )
+                        "\$${DecimalFormat("###,###,###,###.00").format(
+                            DonationConverter.toNextHourFromDonationAmount(
+                                currentDonations
+                            )
+                        )}"
                     )
                 )
             } else {
@@ -331,10 +332,11 @@ class WidgetProvider : AppWidgetProvider() {
                     R.id.to_next_hour,
                     context.getString(
                         R.string.to_next_hour,
-                        String.format(
-                            "%.2f",
-                            DonationConverter.toNextHourFromDonationAmount(currentDonations)
-                        )
+                        "\$${DecimalFormat("###,###,###,###.00").format(
+                            DonationConverter.toNextHourFromDonationAmount(
+                                currentDonations
+                            )
+                        )}"
                     )
                 )
 
