@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000">
@@ -16,20 +17,20 @@
         android:scaleType="fitStart" />
 
     <LinearLayout
-        android:id="@+id/data"
+        android:id="@+id/current_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_centerInParent="false"
+        android:layout_alignParentEnd="false"
+        android:layout_centerInParent="true"
         android:layout_centerVertical="true"
         android:layout_marginEnd="@dimen/data_block_margin"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:visibility="gone">
 
         <TextView
             android:id="@+id/current_total"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="$123,456.78"
             android:textAlignment="center"
             android:textAppearance="@style/CurrentDonationsText" />
 
@@ -37,7 +38,6 @@
             android:id="@+id/hours_bussed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/hours_bussed"
             android:textAlignment="center"
             android:textAppearance="@style/MainText" />
 
@@ -45,9 +45,32 @@
             android:id="@+id/to_next_hour"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="@string/to_next_hour"
             android:textAlignment="center"
             android:textAppearance="@style/MainText" />
+
+        <TextView
+            android:id="@+id/nonfresh_error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView"
+            android:visibility="gone" />
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/error"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="false"
+        android:layout_centerInParent="true"
+        android:text="@string/error_huh"
+        android:textAppearance="@style/ErrorText" />
+
+    <TextView
+        android:id="@+id/status"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:textAppearance="@style/StatusText"
+        android:visibility="gone" />
 
 </RelativeLayout>

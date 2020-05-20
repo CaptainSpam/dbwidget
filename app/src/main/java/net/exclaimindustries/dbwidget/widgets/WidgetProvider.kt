@@ -5,18 +5,22 @@ import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
 import android.os.Build
 import android.os.SystemClock
+import android.text.format.DateUtils
 import android.util.Log
+import android.view.View
 import android.widget.RemoteViews
 import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
 import net.exclaimindustries.dbwidget.R
 import net.exclaimindustries.dbwidget.services.DataFetchService
+import net.exclaimindustries.dbwidget.util.DonationConverter
 import java.util.*
 
 class WidgetProvider : AppWidgetProvider() {
@@ -25,6 +29,18 @@ class WidgetProvider : AppWidgetProvider() {
 
         /** The alarm timeout, in millis.  After this much time, a new fetch will be attempted. */
         private const val ALARM_TIMEOUT_MILLIS = 60000L
+
+        /**
+         * After this amount of time with errors, a line of text will show up saying how long it's
+         * been since the data was fresh.
+         */
+        private const val ERROR_TIMEOUT_MILLIS = 60000L * 10L
+
+        /**
+         * The number of hours we're considering to be part of Thank You Time, which generally runs
+         * well past Omega Shift.
+         */
+        private const val THANK_YOU_HOURS = 3
 
         /** Action name for the alarm. */
         private const val CHECK_ALARM_ACTION = "net.exclaimindustries.dbwidget.CHECK_ALARM"
@@ -158,23 +174,31 @@ class WidgetProvider : AppWidgetProvider() {
                 res.getColor(color)
     }
 
+    override fun onReceive(context: Context, intent: Intent) {
+        super.onReceive(context, intent)
+
+        // If this is the data fetched action, the superclass didn't handle it.  That's where we
+        // step in...
+        if(intent.action === DataFetchService.ACTION_DATA_FETCHED) {
+            renderWidgets(context)
+        }
+    }
+
     override fun onEnabled(context: Context) {
         // When the first widget comes in, we need to start the alarm.  Schedule it up!
         Log.d(DEBUG_TAG, "Starting up now!")
         scheduleAlarm(context)
 
-        // TODO: We need to start observing the LiveData thingy here.
-
-        // TODO: We also need to fire off an initial call to the service to make sure the data has
-        // been fetched at least once, otherwise we might have empty data until the first alarm.
+        DataFetchService.enqueueWork(
+            context,
+            Intent(DataFetchService.ACTION_FETCH_DATA)
+        )
     }
 
     override fun onDisabled(context: Context) {
         // The last widget's going away, so shut off the alarm.
         Log.d(DEBUG_TAG, "Shutting down now!")
         cancelAlarm(context)
-
-        // TODO: Also, stop observing the LiveData thingy.
     }
 
     override fun onUpdate(
@@ -182,29 +206,161 @@ class WidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
-        val shift = getShift(Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")))
+        renderWidgets(context)
+    }
 
-        appWidgetIds.forEach { id ->
-            renderWidget(context, appWidgetManager, id, shift)
-        }
+    private fun renderWidgets(context: Context) {
+        val appWidgetManager = AppWidgetManager.getInstance(context)
+        val shift = getShift(Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")))
+        val appWidgetIds =
+            appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))
+        val event = DataFetchService.Companion.ResultEventLiveData.value
+
+        Log.d(DEBUG_TAG, "Data came in: $event")
+
+        appWidgetIds.forEach { id -> renderWidget(context, appWidgetManager, id, shift, event) }
     }
 
     private fun renderWidget(
         context: Context,
         appWidgetManager: AppWidgetManager,
         id: Int,
-        shift: DBShift
+        shift: DBShift,
+        event: DataFetchService.Companion.ResultEvent?
     ) {
-        // TODO: Actually apply the data!
         val views = RemoteViews(context.packageName, R.layout.dbwidget)
         views.setImageViewResource(R.id.banner, getShiftDrawable(shift))
-
         views.setInt(
             R.id.banner,
             "setBackgroundColor",
             resolveColor(context.resources, getShiftBackgroundColor(shift))
         )
 
+        if (event === null
+            || ((event is DataFetchService.Companion.ResultEvent.Fetched
+                    || event is DataFetchService.Companion.ResultEvent.Cached)
+                    && event.data === null)) {
+            Log.d(DEBUG_TAG, "Null data?  The hell?")
+            // Either nothing's in the LiveData at all yet, or we somehow got a Fetched/Cached event
+            // with no data.  Either way, we're quite confused.
+            views.setViewVisibility(R.id.current_data, View.GONE)
+            views.setViewVisibility(R.id.status, View.GONE)
+            views.setViewVisibility(R.id.error, View.VISIBLE)
+        } else if ((event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
+            || event is DataFetchService.Companion.ResultEvent.ErrorGeneral)
+            && event.data === null) {
+            Log.d(DEBUG_TAG, "Error!")
+            // An error with no data!  Report the error as text.
+                // If we've got no data at all, report the error as text.
+                views.setViewVisibility(R.id.current_data, View.GONE)
+                views.setViewVisibility(R.id.status, View.VISIBLE)
+                views.setViewVisibility(R.id.error, View.GONE)
+
+                views.setTextViewText(
+                    R.id.status,
+                    context.getString(
+                        if (event is DataFetchService.Companion.ResultEvent.ErrorNoConnection)
+                            R.string.error_noconnection
+                        else
+                            R.string.error_general))
+        } else {
+            // The valid data block!  Start with the current time.
+            val now = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+
+            // Then, a new Calendar object for the end of the run, plus a few bonus hours to account
+            // for Thank You Time running well over.
+            val currentDonations = event.data!!.currentDonations
+            val totalHours = DonationConverter.totalHoursForDonationAmount(currentDonations)
+            val endPlusThankYou = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+            endPlusThankYou.timeInMillis = event.data!!.runStartTimeMillis
+            endPlusThankYou.add(Calendar.HOUR, totalHours + THANK_YOU_HOURS)
+
+            // Reset visibilities...
+            views.setViewVisibility(R.id.current_data, View.VISIBLE)
+            views.setViewVisibility(R.id.status, View.GONE)
+            views.setViewVisibility(R.id.error, View.GONE)
+
+            // We always put the current donations up.
+            views.setTextViewText(R.id.current_total, "\$${String.format("%.2f", currentDonations)}")
+
+            if(now.get(Calendar.MONTH) < Calendar.NOVEMBER
+                || now.timeInMillis > endPlusThankYou.timeInMillis) {
+                Log.d(DEBUG_TAG, "Data past the run!")
+                // If this is before November OR we're past the end of the run, display the data in
+                // the past tense.
+                views.setTextViewText(
+                    R.id.hours_bussed,
+                    context.getString(R.string.hours_bussed_end, totalHours)
+                )
+                views.setViewVisibility(R.id.to_next_hour, View.GONE)
+            } else if(now.timeInMillis < event.data!!.runStartTimeMillis) {
+                // If it's November and we're before the start of the run (implying we know the
+                // start of the run and we're waiting for it), display the data in the future tense.
+                views.setTextViewText(
+                    R.id.hours_bussed,
+                    context.getString(
+                        R.string.hours_until_bus,
+                        DateUtils.getRelativeTimeSpanString(
+                            now.timeInMillis,
+                            event.data!!.runStartTimeMillis,
+                            DateUtils.MINUTE_IN_MILLIS,
+                            DateUtils.FORMAT_ABBREV_RELATIVE
+                        )
+                    )
+                )
+                views.setViewVisibility(R.id.to_next_hour, View.VISIBLE)
+                views.setTextViewText(
+                    R.id.to_next_hour,
+                    context.getString(
+                        R.string.to_next_hour,
+                        String.format(
+                            "%.2f",
+                            DonationConverter.toNextHourFromDonationAmount(currentDonations)
+                        )
+                    )
+                )
+            } else {
+                // The run's on!  Full data, now!  Go go go!
+                Log.d(DEBUG_TAG, "Data during the run!")
+                views.setTextViewText(
+                    R.id.hours_bussed,
+                    context.getString(R.string.hours_bussed, 0, totalHours)
+                )
+                views.setViewVisibility(R.id.to_next_hour, View.VISIBLE)
+                views.setTextViewText(
+                    R.id.to_next_hour,
+                    context.getString(
+                        R.string.to_next_hour,
+                        String.format(
+                            "%.2f",
+                            DonationConverter.toNextHourFromDonationAmount(currentDonations)
+                        )
+                    )
+                )
+
+                // Now, if this is an error and it's been over ERROR_TIMEOUT_MILLIS since the last
+                // fresh data, let the user know.
+                if ((event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
+                            || event is DataFetchService.Companion.ResultEvent.ErrorGeneral)
+                    && now.timeInMillis - event.data!!.fetchedAtMillis > ERROR_TIMEOUT_MILLIS) {
+                    views.setViewVisibility(R.id.nonfresh_error, View.VISIBLE)
+                    views.setTextViewText(
+                        R.id.nonfresh_error, context.getString(
+                            R.string.error_nonfresh, DateUtils.getRelativeTimeSpanString(
+                                now.timeInMillis,
+                                event.data!!.fetchedAtMillis,
+                                DateUtils.MINUTE_IN_MILLIS,
+                                DateUtils.FORMAT_ABBREV_RELATIVE
+                            )
+                        )
+                    )
+                } else {
+                    views.setViewVisibility(R.id.nonfresh_error, View.GONE)
+                }
+            }
+        }
+
+        // With everything set, update the widget!
         appWidgetManager.updateAppWidget(id, views)
     }
 }

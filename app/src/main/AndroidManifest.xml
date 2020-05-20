@@ -20,6 +20,7 @@
         <receiver android:name=".widgets.WidgetProvider">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
+                <action android:name="net.exclaimindustries.dbwidget.DATA_FETCHED" />
             </intent-filter>
 
             <meta-data

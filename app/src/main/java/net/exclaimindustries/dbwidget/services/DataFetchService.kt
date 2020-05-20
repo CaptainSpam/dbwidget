@@ -11,6 +11,7 @@ import cz.msebera.android.httpclient.impl.client.HttpClientBuilder
 import net.exclaimindustries.dbwidget.tools.ConnectionStateAwareApplication.Companion.ConnectivityEvent
 import net.exclaimindustries.dbwidget.tools.ConnectionStateAwareApplication.Companion.ConnectivityEventLiveData
 import net.exclaimindustries.dbwidget.util.DonationConverter
+import net.exclaimindustries.dbwidget.widgets.WidgetProvider
 import org.json.JSONArray
 import java.util.*
 
@@ -261,9 +262,8 @@ class DataFetchService : JobIntentService() {
     }
 
     private fun broadcastDataFetched() {
-        // This just lets any broadcast listeners know the LiveData's been updated, which in turn
-        // means it'll be listening in such a way that gives it a Context where LiveData's Observer
-        // doesn't.
-        sendBroadcast(Intent(ACTION_DATA_FETCHED))
+        // This lets the WidgetProvider know the LiveData's been updated, which in turn means it'll
+        // be listening in such a way that gives it a Context where LiveData's Observer doesn't.
+        sendBroadcast(Intent(ACTION_DATA_FETCHED).setClass(this, WidgetProvider::class.java))
     }
 }

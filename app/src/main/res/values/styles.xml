@@ -19,4 +19,16 @@
         <item name="android:textSize">@dimen/text_currentdonations</item>
     </style>
 
+    <style name="ErrorText" parent="MainText">
+        <item name="android:textSize">@dimen/text_currentdonations</item>
+    </style>
+
+    <style name="StatusText" parent="MainText">
+        <item name="android:textSize">@dimen/text_status</item>
+    </style>
+
+    <style name="NonFreshErrorText" parent="MainText">
+        <item name="android:textSize">@dimen/text_nonfresh</item>
+    </style>
+
 </resources>

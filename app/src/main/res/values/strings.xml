@@ -3,8 +3,15 @@
     <string name="label_fetchservice">DB Widget Data Fetch Service</string>
 
     <string name="app_name">Desert Bus for Hope Widget</string>
-    <string name="hours_bussed">%1$s of %2$d hours</string>
-    <string name="to_next_hour">%1$s to next hour</string>
+    <string name="hours_bussed">%1$d of %2$d hours</string>
+    <string name="to_next_hour">$%1$s to next hour</string>
+    <string name="hours_bussed_end">The bus drove for %1$d hours</string>
+    <string name="hours_until_bus">The bus departs %1$s…</string>
+
+    <string name="error_huh">\?</string>
+    <string name="error_noconnection">There appears to be no internet connection.</string>
+    <string name="error_general">Something went wrong.  We\'ll try again in a bit.</string>
+    <string name="error_nonfresh">(haven\'t been able to get fresh data since %1$s)</string>
 
     <string name="acc_banner">Shift banner</string>
 </resources>
