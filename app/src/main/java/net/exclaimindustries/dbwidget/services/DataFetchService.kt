@@ -27,6 +27,9 @@ class DataFetchService : JobIntentService() {
         /** URL to get the current donation total. */
         private const val CURRENT_TOTAL_URL = "https://vst.ninja/milestones/latestTotal"
 
+        /** URL to tell if it's Omega Shift. */
+        private const val OMEGA_CHECK_URL = "http://vst.ninja/Resources/isitomegashift.html"
+
         /**
          * The offset used to determine the current numbered Desert Bus.  DB1 was in 2007, meaning
          * we subtract 2006 from 2007 to get 1, and so on.
@@ -112,7 +115,9 @@ class DataFetchService : JobIntentService() {
             /** The donations needed to reach the next hour. */
             val costToNextHour: Double,
             /** When this data was fetched, in millis.  Used for cache purposes. */
-            val fetchedAtMillis: Long
+            val fetchedAtMillis: Long,
+            /** Whether or not it's Omega Shift. */
+            val omegaShift: Boolean
         )
 
         /** A result from a data fetch. */
@@ -171,7 +176,8 @@ class DataFetchService : JobIntentService() {
         Log.d(DEBUG_TAG, "Welcome to work handling!")
 
         val lastKnownData = ResultEventLiveData.value?.data
-        if (lastKnownData !== null && (Date().time - lastKnownData.fetchedAtMillis < DATA_CACHE_TIME_MILLIS)) {
+        if (lastKnownData !== null
+            && (Date().time - lastKnownData.fetchedAtMillis < DATA_CACHE_TIME_MILLIS)) {
             // The cached data is still new enough, return that immediately.
             dispatchCachedData(lastKnownData)
             return
@@ -179,9 +185,11 @@ class DataFetchService : JobIntentService() {
 
         val currentDonations: Double
         val runStartTime: Long
+        val omegaShift: Boolean
         try {
             currentDonations = fetchCurrentDonations()
             runStartTime = fetchRunStartTime()
+            omegaShift = fetchOmegaShift()
         } catch (e: Exception) {
             Log.e(DEBUG_TAG, "Exception when fetching data:", e)
             dispatchError(if (!networkIsUp) ERROR_NO_NETWORK else ERROR_GENERAL, e)
@@ -193,7 +201,8 @@ class DataFetchService : JobIntentService() {
             currentDonations,
             runStartTime,
             DonationConverter.totalHoursForDonationAmount(currentDonations),
-            DonationConverter.toNextHourFromDonationAmount(currentDonations)
+            DonationConverter.toNextHourFromDonationAmount(currentDonations),
+            omegaShift
         )
     }
 
@@ -203,6 +212,18 @@ class DataFetchService : JobIntentService() {
         val httpGet = HttpGet(CURRENT_TOTAL_URL)
         val handler = BasicResponseHandler()
         return httpClient.execute(httpGet, handler).toDouble()
+    }
+
+    private fun fetchOmegaShift(): Boolean {
+        // First, sanity-check.  If it's not November, it's clearly not Omega Shift.
+        if(Calendar.getInstance().get(Calendar.MONTH) != Calendar.NOVEMBER)
+            return false;
+
+        // If it is November, Omega Shift is a simple call that returns 1 or 0.
+        val httpClient = HttpClientBuilder.create().build()
+        val httpGet = HttpGet(OMEGA_CHECK_URL)
+        val handler = BasicResponseHandler()
+        return httpClient.execute(httpGet, handler).trim() === "1"
     }
 
     private fun fetchRunStartTime(): Long {
@@ -220,7 +241,8 @@ class DataFetchService : JobIntentService() {
         currentDonations: Double,
         runStartTime: Long,
         totalHours: Int,
-        costToNextHour: Double
+        costToNextHour: Double,
+        omegaShift: Boolean
     ) {
         // Welcome to central dispatch, your official broadcast headquarters.
         Log.d(DEBUG_TAG, "Dispatching data...")
@@ -230,7 +252,8 @@ class DataFetchService : JobIntentService() {
             runStartTime,
             totalHours,
             costToNextHour,
-            Date().time
+            Date().time,
+            omegaShift
         )
 
         // Update the LiveData; having the last-seen data available on demand is good.

@@ -133,7 +133,6 @@ class WidgetProvider : AppWidgetProvider() {
 
         /** Gets the shift associated with the given Calendar. */
         private fun getShift(cal: Calendar): DBShift = when (cal.get(Calendar.HOUR_OF_DAY)) {
-            // TODO: Needs Omega Shift!  That might take this out of the companion object...
             in 0..5 -> DBShift.ZetaShift
             in 6..11 -> DBShift.DawnGuard
             in 12..17 -> DBShift.AlphaFlight
@@ -210,11 +209,13 @@ class WidgetProvider : AppWidgetProvider() {
     }
 
     private fun renderWidgets(context: Context) {
+        val event = DataFetchService.Companion.ResultEventLiveData.value
         val appWidgetManager = AppWidgetManager.getInstance(context)
-        val shift = getShift(Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")))
+        val shift =
+            if (event !== null && event.data !== null && event.data!!.omegaShift) DBShift.OmegaShift
+            else getShift(Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")))
         val appWidgetIds =
             appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))
-        val event = DataFetchService.Companion.ResultEventLiveData.value
 
         Log.d(DEBUG_TAG, "Data came in: $event")
 
@@ -240,7 +241,6 @@ class WidgetProvider : AppWidgetProvider() {
             || ((event is DataFetchService.Companion.ResultEvent.Fetched
                     || event is DataFetchService.Companion.ResultEvent.Cached)
                     && event.data === null)) {
-            Log.d(DEBUG_TAG, "Null data?  The hell?")
             // Either nothing's in the LiveData at all yet, or we somehow got a Fetched/Cached event
             // with no data.  Either way, we're quite confused.
             views.setViewVisibility(R.id.current_data, View.GONE)
@@ -249,7 +249,6 @@ class WidgetProvider : AppWidgetProvider() {
         } else if ((event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
             || event is DataFetchService.Companion.ResultEvent.ErrorGeneral)
             && event.data === null) {
-            Log.d(DEBUG_TAG, "Error!")
             // An error with no data!  Report the error as text.
                 // If we've got no data at all, report the error as text.
                 views.setViewVisibility(R.id.current_data, View.GONE)
@@ -279,13 +278,13 @@ class WidgetProvider : AppWidgetProvider() {
             views.setViewVisibility(R.id.current_data, View.VISIBLE)
             views.setViewVisibility(R.id.status, View.GONE)
             views.setViewVisibility(R.id.error, View.GONE)
+            views.setViewVisibility(R.id.nonfresh_error, View.GONE)
 
             // We always put the current donations up.
             views.setTextViewText(R.id.current_total, "\$${String.format("%.2f", currentDonations)}")
 
             if(now.get(Calendar.MONTH) < Calendar.NOVEMBER
                 || now.timeInMillis > endPlusThankYou.timeInMillis) {
-                Log.d(DEBUG_TAG, "Data past the run!")
                 // If this is before November OR we're past the end of the run, display the data in
                 // the past tense.
                 views.setTextViewText(
@@ -321,7 +320,6 @@ class WidgetProvider : AppWidgetProvider() {
                 )
             } else {
                 // The run's on!  Full data, now!  Go go go!
-                Log.d(DEBUG_TAG, "Data during the run!")
                 views.setTextViewText(
                     R.id.hours_bussed,
                     context.getString(R.string.hours_bussed, 0, totalHours)
