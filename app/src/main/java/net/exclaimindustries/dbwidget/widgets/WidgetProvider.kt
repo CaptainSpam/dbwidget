@@ -38,6 +38,12 @@ class WidgetProvider : AppWidgetProvider() {
         private const val ERROR_TIMEOUT_MILLIS = 60000L * 10L
 
         /**
+         * The number of millis in an hour (1000 millis per second * 60 seconds per minute * 60
+         * minutes per hour).
+         */
+        private const val MILLIS_PER_HOUR = 1000L * 60L * 60L
+
+        /**
          * The number of hours we're considering to be part of Thank You Time, which generally runs
          * well past Omega Shift.
          */
@@ -330,7 +336,11 @@ class WidgetProvider : AppWidgetProvider() {
                 // The run's on!  Full data, now!  Go go go!
                 views.setTextViewText(
                     R.id.hours_bussed,
-                    context.getString(R.string.hours_bussed, 0, totalHours)
+                    context.getString(
+                        R.string.hours_bussed,
+                        (now.timeInMillis - event.data!!.runStartTimeMillis) / MILLIS_PER_HOUR,
+                        totalHours
+                    )
                 )
                 views.setViewVisibility(R.id.to_next_hour, View.VISIBLE)
                 views.setTextViewText(
