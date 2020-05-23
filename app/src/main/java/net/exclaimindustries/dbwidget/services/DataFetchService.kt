@@ -219,11 +219,17 @@ class DataFetchService : JobIntentService() {
         if(Calendar.getInstance().get(Calendar.MONTH) != Calendar.NOVEMBER)
             return false;
 
-        // If it is November, Omega Shift is a simple call that returns 1 or 0.
-        val httpClient = HttpClientBuilder.create().build()
-        val httpGet = HttpGet(OMEGA_CHECK_URL)
-        val handler = BasicResponseHandler()
-        return httpClient.execute(httpGet, handler).trim() === "1"
+        return try {
+            // If it IS November, Omega Shift is a simple call that returns 1 or 0.
+            val httpClient = HttpClientBuilder.create().build()
+            val httpGet = HttpGet(OMEGA_CHECK_URL)
+            val handler = BasicResponseHandler()
+            httpClient.execute(httpGet, handler).trim() === "1"
+        } catch(e: Exception) {
+            // If, however, that threw an exception, just consider it to be false.  This check is
+            // less vital and can be kicked down the road a bit.
+            false
+        }
     }
 
     private fun fetchRunStartTime(): Long {
