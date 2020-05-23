@@ -217,7 +217,7 @@ class DataFetchService : JobIntentService() {
     private fun fetchOmegaShift(): Boolean {
         // First, sanity-check.  If it's not November, it's clearly not Omega Shift.
         if(Calendar.getInstance().get(Calendar.MONTH) != Calendar.NOVEMBER)
-            return false;
+            return false
 
         return try {
             // If it IS November, Omega Shift is a simple call that returns 1 or 0.
