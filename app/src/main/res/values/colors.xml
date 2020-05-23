@@ -5,6 +5,7 @@
     <color name="colorAccent">#03DAC5</color>
 
     <color name="text">#fff</color>
+    <color name="textShadow">#000</color>
 
     <color name="background_dawnguard">#ef8131</color>
     <color name="background_alphaflight">#b1222a</color>
