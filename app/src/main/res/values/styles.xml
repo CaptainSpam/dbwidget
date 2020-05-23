@@ -19,7 +19,7 @@
         <item name="android:shadowDx">4.0</item>
         <item name="android:shadowDy">4.0</item>
         <item name="android:shadowRadius">1.0</item>
-
+        <item name="android:textAlignment">center</item>
     </style>
 
     <style name="CurrentDonationsText" parent="MainText">
@@ -28,7 +28,7 @@
     </style>
 
     <style name="ErrorText" parent="MainText">
-        <item name="android:textSize">@dimen/text_currentdonations</item>
+        <item name="android:textSize">@dimen/text_errorfull</item>
     </style>
 
     <style name="StatusText" parent="MainText">

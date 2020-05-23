@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000">
@@ -20,7 +21,6 @@
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="false"
         android:layout_centerInParent="true"
-        android:layout_centerVertical="true"
         android:layout_marginEnd="@dimen/data_block_margin"
         android:orientation="vertical"
         android:visibility="gone">
@@ -30,21 +30,24 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:textAppearance="@style/CurrentDonationsText" />
+            android:textAppearance="@style/CurrentDonationsText"
+            tools:text="$123,456.78" />
 
         <TextView
             android:id="@+id/hours_bussed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:textAppearance="@style/MainText" />
+            android:textAppearance="@style/MainText"
+            tools:text="67 HOURS OF 133 SO FAR" />
 
         <TextView
             android:id="@+id/to_next_hour"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:textAlignment="center"
-            android:textAppearance="@style/MainText" />
+            android:textAppearance="@style/MainText"
+            tools:text="NEXT HOUR: $271.11" />
 
         <TextView
             android:id="@+id/nonfresh_error"
@@ -60,7 +63,9 @@
         android:layout_alignParentBottom="false"
         android:layout_centerInParent="true"
         android:text="@string/error_huh"
-        android:textAppearance="@style/ErrorText" />
+        android:textAppearance="@style/ErrorText"
+        android:visibility="visible"
+        tools:text="Something's gone all kerflooey again." />
 
     <TextView
         android:id="@+id/status"
