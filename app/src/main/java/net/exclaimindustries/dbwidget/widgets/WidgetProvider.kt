@@ -112,6 +112,7 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         private fun cancelAlarm(context: Context) {
+            Log.d(DEBUG_TAG, "Canceling the alarm...")
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             alarmManager.cancel(
@@ -185,14 +186,8 @@ class WidgetProvider : AppWidgetProvider() {
     }
 
     override fun onEnabled(context: Context) {
-        // When the first widget comes in, we need to start the alarm.  Schedule it up!
+        // When the first widget comes in, log it.  The actual business end happens in onUpdate.
         Log.d(DEBUG_TAG, "Starting up now!")
-        scheduleAlarm(context)
-
-        DataFetchService.enqueueWork(
-            context,
-            Intent(DataFetchService.ACTION_FETCH_DATA)
-        )
     }
 
     override fun onDisabled(context: Context) {
@@ -206,7 +201,17 @@ class WidgetProvider : AppWidgetProvider() {
         appWidgetManager: AppWidgetManager,
         appWidgetIds: IntArray
     ) {
+        // The only times we get onUpdate should be when a new widget is added or if the APK is
+        // overwritten.  Do the alarms and fetchwork here.
+        Log.d(DEBUG_TAG, "onUpdate!")
+
+        cancelAlarm(context)
+        scheduleAlarm(context)
         renderWidgets(context)
+        DataFetchService.enqueueWork(
+            context,
+            Intent(DataFetchService.ACTION_FETCH_DATA)
+        )
     }
 
     private fun renderWidgets(context: Context) {
