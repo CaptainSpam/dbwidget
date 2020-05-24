@@ -57,11 +57,9 @@ class WidgetProvider : AppWidgetProvider() {
             override fun onReceive(context: Context, intent: Intent) {
                 val cal = Calendar.getInstance()
 
-                if (cal.get(Calendar.MONTH) != Calendar.NOVEMBER) {
-                    Log.d(
-                        DEBUG_TAG,
-                        "ALARM!!!!  It's still not November, sending intent to update the background..."
-                    )
+                if (cal.get(Calendar.MONTH) != Calendar.NOVEMBER
+                    && DataFetchService.Companion.ResultEventLiveData.value?.data !== null) {
+                    Log.d(DEBUG_TAG, "ALARM!!!!  It's still not November!")
                     // If it's still not November, lie to the service and claim there's an update.
                     // That'll update the banner background if need be.
                     context.sendBroadcast(
@@ -257,7 +255,7 @@ class WidgetProvider : AppWidgetProvider() {
         val event = DataFetchService.Companion.ResultEventLiveData.value
         val appWidgetManager = AppWidgetManager.getInstance(context)
         val shift =
-            if (event !== null && event.data !== null && event.data!!.omegaShift) DBShift.OmegaShift
+            if (event?.data?.omegaShift == true) DBShift.OmegaShift
             else getShift(Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")))
         val appWidgetIds =
             appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))
