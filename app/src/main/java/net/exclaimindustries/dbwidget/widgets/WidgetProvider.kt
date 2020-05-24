@@ -192,8 +192,16 @@ class WidgetProvider : AppWidgetProvider() {
     }
 
     override fun onEnabled(context: Context) {
-        // When the first widget comes in, log it.  The actual business end happens in onUpdate.
+        // When the first widget comes in, do an initial fetch call so we've got some data.
         Log.d(DEBUG_TAG, "Starting up now!")
+
+        DataFetchService.enqueueWork(
+            context,
+            Intent(DataFetchService.ACTION_FETCH_DATA)
+        )
+
+        // Also, render up.
+        renderWidgets(context)
     }
 
     override fun onDisabled(context: Context) {
@@ -229,7 +237,7 @@ class WidgetProvider : AppWidgetProvider() {
         val appWidgetIds =
             appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))
 
-        Log.d(DEBUG_TAG, "Data came in: $event")
+        Log.d(DEBUG_TAG, "Rendering for data: $event")
 
         appWidgetIds.forEach { id -> renderWidget(context, appWidgetManager, id, shift, event) }
     }
