@@ -55,15 +55,32 @@ class WidgetProvider : AppWidgetProvider() {
         /** This does whatever needs doing for the alarm. */
         class AlarmReceiver : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                Log.d(DEBUG_TAG, "ALARM!!!!!")
-                // ALARM!  Tell the service to try a fetch.  That will fire off updates on the
-                // LiveData object for the widget to find later.  It'll be hilarious, trust me.
-                DataFetchService.enqueueWork(
-                    context,
-                    Intent(DataFetchService.ACTION_FETCH_DATA)
-                )
+                val cal = Calendar.getInstance()
 
-                // Then, reschedule for another minute down the line.
+                if (cal.get(Calendar.MONTH) != Calendar.NOVEMBER) {
+                    Log.d(
+                        DEBUG_TAG,
+                        "ALARM!!!!  It's still not November, sending intent to update the background..."
+                    )
+                    // If it's still not November, lie to the service and claim there's an update.
+                    // That'll update the banner background if need be.
+                    context.sendBroadcast(
+                        Intent(DataFetchService.ACTION_DATA_FETCHED).setClass(
+                            context,
+                            WidgetProvider::class.java
+                        )
+                    )
+                } else {
+                    Log.d(DEBUG_TAG, "ALARM!!!!  Enqueueing work!")
+                    // Tell the service to try a fetch.  That will fire off updates on the LiveData
+                    // object for the widget to find later.  It'll be hilarious, trust me.
+                    DataFetchService.enqueueWork(
+                        context,
+                        Intent(DataFetchService.ACTION_FETCH_DATA)
+                    )
+                }
+
+                // In any case, reschedule for later down the line.
                 scheduleAlarm(context)
             }
         }
@@ -71,19 +88,27 @@ class WidgetProvider : AppWidgetProvider() {
         private fun scheduleAlarm(context: Context) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            val cal = Calendar.getInstance()
+            // The resolution we're dealing with in this check is the span of a month, so a
+            // difference of a few time zones is trivial.  We can therefore always use Pacific Time
+            // here, which will come in handy when rescheduling the alarm for banner updates.
+            val cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"))
 
             if(cal.get(Calendar.MONTH) != Calendar.NOVEMBER) {
-                // If it's NOT November, just schedule a wakeup on the first of November.  Sure, why
-                // not?  Someone might leave their device awake until November.
-                Log.d(DEBUG_TAG, "It's not November; setting something to wake me up when October ends...")
+                // If it's NOT November, just schedule an alarm for the next time the banner needs
+                // to update.
+                Log.d(DEBUG_TAG, "It's not November; scheduling for the next banner update...")
 
-                cal.set(Calendar.MONTH, Calendar.NOVEMBER)
-                cal.set(Calendar.DAY_OF_MONTH, 1)
-                if(cal.get(Calendar.MONTH) == Calendar.DECEMBER) {
-                    // It's December (and thus past November); wait until next year.
-                    cal.add(Calendar.YEAR, 1)
+                when(cal.get(Calendar.HOUR_OF_DAY)) {
+                    in 0..5 -> cal.set(Calendar.HOUR_OF_DAY, 6)
+                    in 6..11 -> cal.set(Calendar.HOUR_OF_DAY, 12)
+                    in 12..17 -> cal.set(Calendar.HOUR_OF_DAY, 18)
+                    in 18..23 -> {
+                        cal.set(Calendar.HOUR_OF_DAY, 0)
+                        cal.add(Calendar.DATE, 1)
+                    }
                 }
+                cal.set(Calendar.MINUTE, 0)
+                cal.set(Calendar.SECOND, 0)
 
                 alarmManager.set(
                     AlarmManager.RTC,
