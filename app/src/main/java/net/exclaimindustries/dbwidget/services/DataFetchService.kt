@@ -27,6 +27,9 @@ class DataFetchService : JobIntentService() {
         /** URL to get the current donation total. */
         private const val CURRENT_TOTAL_URL = "https://vst.ninja/milestones/latestTotal"
 
+        /** URL to get the stats.  Replace "<YEAR>" with the actual numbered DB. */
+        private const val STATS_URL_BASE = "https://vst.ninja/DB<YEAR>/data/DB<YEAR>_stats.json"
+
         /** URL to tell if it's Omega Shift. */
         private const val OMEGA_CHECK_URL = "http://vst.ninja/Resources/isitomegashift.html"
 
@@ -97,7 +100,7 @@ class DataFetchService : JobIntentService() {
 
             // The stats URL uses DB labels that are numbered SEQUENTIALLY, not by "official" name
             // (that is, the Desert Bus that happened in 2017 is DB11, not DB2017).
-            return "https://vst.ninja/DB${actualYear}/data/DB${actualYear}_stats.json"
+            return STATS_URL_BASE.replace("<YEAR>", actualYear.toString())
         }
 
         /** The data from a successful fetch. */
