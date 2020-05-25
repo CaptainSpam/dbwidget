@@ -322,13 +322,13 @@ class WidgetProvider : AppWidgetProvider() {
             // The valid data block!  Start with the current time.
             val now = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
 
+            val data = event.data!!
+
             // Then, a new Calendar object for the end of the run, plus a few bonus hours to account
             // for Thank You Time running well over.
-            val currentDonations = event.data!!.currentDonations
-            val totalHours = DonationConverter.totalHoursForDonationAmount(currentDonations)
             val endPlusThankYou = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-            endPlusThankYou.timeInMillis = event.data!!.runStartTimeMillis
-            endPlusThankYou.add(Calendar.HOUR, totalHours + THANK_YOU_HOURS)
+            endPlusThankYou.timeInMillis = data.runStartTimeMillis
+            endPlusThankYou.add(Calendar.HOUR, data.totalHours + THANK_YOU_HOURS)
 
             // Reset visibilities...
             views.setViewVisibility(R.id.current_data, View.VISIBLE)
@@ -338,7 +338,7 @@ class WidgetProvider : AppWidgetProvider() {
 
             // We always put the current donations up.
             views.setTextViewText(R.id.current_total,
-                "\$${DecimalFormat("###,###,###,###.00").format(currentDonations)}")
+                "\$${DecimalFormat("###,###,###,###.00").format(data.currentDonations)}")
 
             if(now.get(Calendar.MONTH) < Calendar.NOVEMBER
                 || now.timeInMillis > endPlusThankYou.timeInMillis) {
@@ -346,10 +346,10 @@ class WidgetProvider : AppWidgetProvider() {
                 // the past tense.
                 views.setTextViewText(
                     R.id.hours_bussed,
-                    context.getString(R.string.hours_bussed_end, totalHours)
+                    context.getString(R.string.hours_bussed_end, data.totalHours)
                 )
                 views.setViewVisibility(R.id.to_next_hour, View.GONE)
-            } else if(now.timeInMillis < event.data!!.runStartTimeMillis) {
+            } else if(now.timeInMillis < data.runStartTimeMillis) {
                 // If it's November and we're before the start of the run (implying we know the
                 // start of the run and we're waiting for it), display the data in the future tense.
                 views.setTextViewText(
@@ -358,7 +358,7 @@ class WidgetProvider : AppWidgetProvider() {
                         R.string.hours_until_bus,
                         DateUtils.getRelativeTimeSpanString(
                             now.timeInMillis,
-                            event.data!!.runStartTimeMillis,
+                            data.runStartTimeMillis,
                             DateUtils.MINUTE_IN_MILLIS,
                             DateUtils.FORMAT_ABBREV_RELATIVE
                         )
@@ -371,7 +371,7 @@ class WidgetProvider : AppWidgetProvider() {
                         R.string.to_next_hour,
                         "\$${DecimalFormat("###,###,###,###.00").format(
                             DonationConverter.toNextHourFromDonationAmount(
-                                currentDonations
+                                data.currentDonations
                             )
                         )}"
                     )
@@ -382,8 +382,8 @@ class WidgetProvider : AppWidgetProvider() {
                     R.id.hours_bussed,
                     context.getString(
                         R.string.hours_bussed,
-                        (now.timeInMillis - event.data!!.runStartTimeMillis) / MILLIS_PER_HOUR,
-                        totalHours
+                        (now.timeInMillis - data.runStartTimeMillis) / MILLIS_PER_HOUR,
+                        data.totalHours
                     )
                 )
                 views.setViewVisibility(R.id.to_next_hour, View.VISIBLE)
@@ -393,7 +393,7 @@ class WidgetProvider : AppWidgetProvider() {
                         R.string.to_next_hour,
                         "\$${DecimalFormat("###,###,###,###.00").format(
                             DonationConverter.toNextHourFromDonationAmount(
-                                currentDonations
+                                data.currentDonations
                             )
                         )}"
                     )
@@ -403,13 +403,13 @@ class WidgetProvider : AppWidgetProvider() {
                 // fresh data, let the user know.
                 if ((event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
                             || event is DataFetchService.Companion.ResultEvent.ErrorGeneral)
-                    && now.timeInMillis - event.data!!.fetchedAtMillis > ERROR_TIMEOUT_MILLIS) {
+                    && now.timeInMillis - data.fetchedAtMillis > ERROR_TIMEOUT_MILLIS) {
                     views.setViewVisibility(R.id.nonfresh_error, View.VISIBLE)
                     views.setTextViewText(
                         R.id.nonfresh_error, context.getString(
                             R.string.error_nonfresh, DateUtils.getRelativeTimeSpanString(
                                 now.timeInMillis,
-                                event.data!!.fetchedAtMillis,
+                                data.fetchedAtMillis,
                                 DateUtils.MINUTE_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_RELATIVE
                             )
