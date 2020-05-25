@@ -55,10 +55,15 @@ class WidgetProvider : AppWidgetProvider() {
         /** This does whatever needs doing for the alarm. */
         class AlarmReceiver : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                val cal = Calendar.getInstance()
-
-                if (cal.get(Calendar.MONTH) != Calendar.NOVEMBER
-                    && DataFetchService.Companion.ResultEventLiveData.value?.data !== null) {
+                if(isNovember()) {
+                    Log.d(DEBUG_TAG, "ALARM!!!!  Enqueueing work!")
+                    // Tell the service to try a fetch.  That will fire off updates on the LiveData
+                    // object for the widget to find later.  It'll be hilarious, trust me.
+                    DataFetchService.enqueueWork(
+                        context,
+                        Intent(DataFetchService.ACTION_FETCH_DATA)
+                    )
+                } else {
                     Log.d(DEBUG_TAG, "ALARM!!!!  It's still not November!")
                     // If it's still not November, lie to the service and claim there's an update.
                     // That'll update the banner background if need be.
@@ -68,14 +73,6 @@ class WidgetProvider : AppWidgetProvider() {
                             WidgetProvider::class.java
                         )
                     )
-                } else {
-                    Log.d(DEBUG_TAG, "ALARM!!!!  Enqueueing work!")
-                    // Tell the service to try a fetch.  That will fire off updates on the LiveData
-                    // object for the widget to find later.  It'll be hilarious, trust me.
-                    DataFetchService.enqueueWork(
-                        context,
-                        Intent(DataFetchService.ACTION_FETCH_DATA)
-                    )
                 }
 
                 // In any case, reschedule for later down the line.
@@ -83,18 +80,53 @@ class WidgetProvider : AppWidgetProvider() {
             }
         }
 
+        /**
+         * Determines if it's November or not.  If it IS November, that means we schedule the next
+         * update for one minute from now and make that alarm do an actual fetch.  If it's NOT
+         * November, the updates come only at shift changes (to update the banner) and do NOT call
+         * for another data fetch.
+         *
+         * Note that last part about the data fetch; for the purposes of this function, if there is
+         * no data yet (either because this is the first run since boot or there was a fetch error
+         * before actual data came in), then it IS "November", meaning fetches should happen every
+         * minute until the problem is cleared up.
+         */
+        private fun isNovember(): Boolean = Calendar.getInstance()
+            .get(Calendar.MONTH) == Calendar.NOVEMBER
+                || DataFetchService.Companion.ResultEventLiveData.value?.data === null
+
         private fun scheduleAlarm(context: Context) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            // The resolution we're dealing with in this check is the span of a month, so a
-            // difference of a few time zones is trivial.  We can therefore always use Pacific Time
-            // here, which will come in handy when rescheduling the alarm for banner updates.
-            val cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"))
+            if(isNovember()) {
+                Log.d(
+                    DEBUG_TAG,
+                    "Setting alarm for ${SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS}..."
+                )
 
-            if(cal.get(Calendar.MONTH) != Calendar.NOVEMBER) {
-                // If it's NOT November, just schedule an alarm for the next time the banner needs
-                // to update.
+                // We'll use plain alarms and reschedule as needed.  We'll do this primarily because
+                // we DON'T want this to use a wakeup alarm, and we DO want it to be able to drift
+                // as need be.  Excessive checks would be pointless.
+                alarmManager.set(
+                    AlarmManager.ELAPSED_REALTIME,
+                    SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS,
+                    PendingIntent.getBroadcast(
+                        context,
+                        0,
+                        Intent(context, AlarmReceiver::class.java).setAction(CHECK_ALARM_ACTION),
+                        0
+                    )
+                )
+            } else {
+                // If it's NOT November (and we have valid, non-error data), just schedule an alarm
+                // for the next time the banner needs to update.
                 Log.d(DEBUG_TAG, "It's not November; scheduling for the next banner update...")
+
+                // The resolution we're dealing with in this check is the span of a month, so a
+                // difference of a few time zones is trivial.  We can therefore always use Pacific
+                // Time here, which will come in handy when rescheduling the alarm for banner
+                // updates.
+                val cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"))
 
                 when(cal.get(Calendar.HOUR_OF_DAY)) {
                     in 0..5 -> cal.set(Calendar.HOUR_OF_DAY, 6)
@@ -111,25 +143,6 @@ class WidgetProvider : AppWidgetProvider() {
                 alarmManager.set(
                     AlarmManager.RTC,
                     cal.timeInMillis,
-                    PendingIntent.getBroadcast(
-                        context,
-                        0,
-                        Intent(context, AlarmReceiver::class.java).setAction(CHECK_ALARM_ACTION),
-                        0
-                    )
-                )
-            } else {
-                Log.d(
-                    DEBUG_TAG,
-                    "Setting alarm for ${SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS}..."
-                )
-
-                // We'll use plain alarms and reschedule as needed.  We'll do this primarily because
-                // we DON'T want this to use a wakeup alarm, and we DO want it to be able to drift
-                // as need be.  Excessive checks would be pointless.
-                alarmManager.set(
-                    AlarmManager.ELAPSED_REALTIME,
-                    SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS,
                     PendingIntent.getBroadcast(
                         context,
                         0,
