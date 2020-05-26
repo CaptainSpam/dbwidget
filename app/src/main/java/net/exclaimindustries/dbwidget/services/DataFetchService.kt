@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.JobIntentService
 import androidx.lifecycle.LiveData
+import cz.msebera.android.httpclient.client.HttpResponseException
 import cz.msebera.android.httpclient.client.methods.HttpGet
 import cz.msebera.android.httpclient.impl.client.BasicResponseHandler
 import cz.msebera.android.httpclient.impl.client.HttpClientBuilder
@@ -80,6 +81,8 @@ class DataFetchService : JobIntentService() {
          *
          * If the year is not null, this will use the given year unmodified, regardless of the
          * current date.
+         *
+         * Note that there is no guarantee that the resulting URL will point to an extant file.
          *
          * @param year the year to use, or null for today's year
          */
@@ -214,36 +217,62 @@ class DataFetchService : JobIntentService() {
         val httpClient = HttpClientBuilder.create().build()
         val httpGet = HttpGet(CURRENT_TOTAL_URL)
         val handler = BasicResponseHandler()
+
+        Log.d(DEBUG_TAG, "Fetching current donations...")
         return httpClient.execute(httpGet, handler).toDouble()
     }
 
     private fun fetchOmegaShift(): Boolean {
         // First, sanity-check.  If it's not November, it's clearly not Omega Shift.
-        if(Calendar.getInstance().get(Calendar.MONTH) != Calendar.NOVEMBER)
+        if(Calendar.getInstance().get(Calendar.MONTH) != Calendar.NOVEMBER) {
+            Log.d(DEBUG_TAG, "It's not November, so returning false for Omega Shift...")
             return false
+        }
 
         return try {
             // If it IS November, Omega Shift is a simple call that returns 1 or 0.
             val httpClient = HttpClientBuilder.create().build()
             val httpGet = HttpGet(OMEGA_CHECK_URL)
             val handler = BasicResponseHandler()
+            Log.d(DEBUG_TAG, "Fetching Omega Shift...")
             httpClient.execute(httpGet, handler).trim() === "1"
         } catch(e: Exception) {
             // If, however, that threw an exception, just consider it to be false.  This check is
             // less vital and can be kicked down the road a bit.
+            Log.d(DEBUG_TAG, "Omega Shift fetching had a problem, returning false...", e)
             false
         }
     }
 
     private fun fetchRunStartTime(): Long {
-        // Same thing, just with more potential for parsing errors...
-        val httpClient = HttpClientBuilder.create().build()
-        val httpGet = HttpGet(getStatsUrl())
-        val handler = BasicResponseHandler()
-        // ...because THIS time, it's JSON!
-        val json = JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
+        // Step one, try to fetch THIS year's run data.
+        val year = Calendar.getInstance().get(Calendar.YEAR)
 
-        return json.getLong("Year Start Actual UNIX Time") * 1000
+        val httpClient = HttpClientBuilder.create().build()
+        val handler = BasicResponseHandler()
+
+        var httpGet:HttpGet
+
+        try {
+            httpGet = HttpGet(getStatsUrl(year))
+            Log.d(DEBUG_TAG, "Attempting stats fetch on ${httpGet.uri}...")
+            return JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
+                .getLong("Year Start Actual UNIX Time") * 1000
+        } catch (e: Exception) {
+            // If that threw a 404, try backing off a year.
+            if (e is HttpResponseException && e.statusCode == 404) {
+                // If it throws THIS time, don't catch it; we've got a legit problem now and the
+                // caller should bail out to an error response.
+                httpGet = HttpGet(getStatsUrl(year - 1))
+                Log.d(DEBUG_TAG, "404'd; trying stats fetch on ${httpGet.uri}...")
+                return JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
+                    .getLong("Year Start Actual UNIX Time") * 1000
+            } else {
+                // If it's NOT a 404 (or is some other exception), just throw it back.
+                Log.d(DEBUG_TAG, "That was a complete failure:", e)
+                throw e
+            }
+        }
     }
 
     private fun dispatchData(
