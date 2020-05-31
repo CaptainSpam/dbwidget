@@ -357,8 +357,8 @@ class WidgetProvider : AppWidgetProvider() {
                     context.getString(
                         R.string.hours_until_bus,
                         DateUtils.getRelativeTimeSpanString(
-                            now.timeInMillis,
                             data.runStartTimeMillis,
+                            now.timeInMillis,
                             DateUtils.MINUTE_IN_MILLIS,
                             DateUtils.FORMAT_ABBREV_RELATIVE
                         )
