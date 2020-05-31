@@ -7,7 +7,7 @@
     <string name="hours_bussed">%1$d HOURS OF %2$d SO FAR</string>
     <string name="to_next_hour">NEXT HOUR: %1$s</string>
     <string name="hours_bussed_end">The bus drove for %1$d hours</string>
-    <string name="hours_until_bus">The bus departs %1$s…</string>
+    <string name="hours_until_bus">The bus departs %1$s</string>
 
     <string name="error_huh">Waiting for data…</string>
     <string name="error_noconnection">There appears to be no internet connection.</string>
