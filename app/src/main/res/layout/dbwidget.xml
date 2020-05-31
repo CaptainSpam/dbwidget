@@ -66,6 +66,7 @@
         android:layout_alignParentBottom="false"
         android:layout_centerInParent="true"
         android:text="@string/error_huh"
+        android:textAlignment="center"
         android:textAppearance="@style/ErrorText"
         android:visibility="visible"
         tools:text="Something's gone all kerflooey again." />
@@ -75,6 +76,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_centerInParent="true"
+        android:textAlignment="center"
         android:textAppearance="@style/StatusText"
         android:visibility="gone" />
 

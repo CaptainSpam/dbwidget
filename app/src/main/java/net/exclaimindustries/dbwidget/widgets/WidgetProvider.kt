@@ -305,19 +305,18 @@ class WidgetProvider : AppWidgetProvider() {
         } else if ((event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
             || event is DataFetchService.Companion.ResultEvent.ErrorGeneral)
             && event.data === null) {
-            // An error with no data!  Report the error as text.
-                // If we've got no data at all, report the error as text.
-                views.setViewVisibility(R.id.current_data, View.GONE)
-                views.setViewVisibility(R.id.status, View.VISIBLE)
-                views.setViewVisibility(R.id.error, View.GONE)
+            // If we've got an error with no data at all, report the error as text.
+            views.setViewVisibility(R.id.current_data, View.GONE)
+            views.setViewVisibility(R.id.status, View.VISIBLE)
+            views.setViewVisibility(R.id.error, View.GONE)
 
-                views.setTextViewText(
-                    R.id.status,
-                    context.getString(
-                        if (event is DataFetchService.Companion.ResultEvent.ErrorNoConnection)
-                            R.string.error_noconnection
-                        else
-                            R.string.error_general))
+            views.setTextViewText(
+                R.id.status,
+                context.getString(
+                    if (event is DataFetchService.Companion.ResultEvent.ErrorNoConnection)
+                        R.string.error_noconnection
+                    else
+                        R.string.error_general))
         } else {
             // The valid data block!  Start with the current time.
             val now = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
