@@ -53,7 +53,10 @@
             android:id="@+id/nonfresh_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:visibility="gone" />
+            android:textAlignment="center"
+            android:textAppearance="@style/NonFreshErrorText"
+            android:visibility="gone"
+            tools:text="(haven't had fresh data in a while)"/>
     </LinearLayout>
 
     <TextView
