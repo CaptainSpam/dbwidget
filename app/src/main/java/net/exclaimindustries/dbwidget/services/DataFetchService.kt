@@ -51,9 +51,9 @@ class DataFetchService : JobIntentService() {
 
         /**
          * The amount of time the data is considered to still be fresh enough to be returned, in
-         * millis.  Currently 60 seconds.
+         * millis.  Currently 30 seconds.
          */
-        private const val DATA_CACHE_TIME_MILLIS = 60000L
+        private const val DATA_CACHE_TIME_MILLIS = 30000L
 
         /** Action name for fetching data. */
         const val ACTION_FETCH_DATA = "net.exclaimindustries.dbwidget.FETCH_DATA"
