@@ -25,14 +25,20 @@ class DataFetchService : JobIntentService() {
     companion object {
         private const val DEBUG_TAG = "DataFetchService"
 
+        /**
+         * The prefix to all data URLs.  Under normal circumstances, this should be the VST's site,
+         * "https://vst.ninja/".  This is here to make changing things for testing easier.
+         */
+        private const val URL_PREFIX = "https://vst.ninja/"
+
         /** URL to get the current donation total. */
-        private const val CURRENT_TOTAL_URL = "https://vst.ninja/milestones/latestTotal"
+        private const val CURRENT_TOTAL_URL = "${URL_PREFIX}milestones/latestTotal"
 
         /** URL to get the stats.  Replace "<YEAR>" with the actual numbered DB. */
-        private const val STATS_URL_BASE = "https://vst.ninja/DB<YEAR>/data/DB<YEAR>_stats.json"
+        private const val STATS_URL_BASE = "${URL_PREFIX}DB<YEAR>/data/DB<YEAR>_stats.json"
 
         /** URL to tell if it's Omega Shift. */
-        private const val OMEGA_CHECK_URL = "http://vst.ninja/Resources/isitomegashift.html"
+        private const val OMEGA_CHECK_URL = "${URL_PREFIX}Resources/isitomegashift.html"
 
         /**
          * The offset used to determine the current numbered Desert Bus.  DB1 was in 2007, meaning
