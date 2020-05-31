@@ -165,24 +165,6 @@ class DataFetchService : JobIntentService() {
         }
     }
 
-    private var networkIsUp = false
-    private val networkStateObserver =
-        androidx.lifecycle.Observer<ConnectivityEvent> { event ->
-            networkIsUp = event is ConnectivityEvent.ConnectivityAvailable
-        }
-
-    override fun onCreate() {
-        super.onCreate()
-
-        ConnectivityEventLiveData.observeForever(networkStateObserver)
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        ConnectivityEventLiveData.removeObserver(networkStateObserver)
-    }
-
     override fun onHandleWork(intent: Intent) {
         // Hello!  We're on a separate thread now!  Isn't that convenient?
         Log.d(DEBUG_TAG, "Welcome to work handling!")
@@ -204,7 +186,15 @@ class DataFetchService : JobIntentService() {
             omegaShift = fetchOmegaShift()
         } catch (e: Exception) {
             Log.e(DEBUG_TAG, "Exception when fetching data:", e)
-            dispatchError(if (!networkIsUp) ERROR_NO_NETWORK else ERROR_GENERAL, e)
+            val event = ConnectivityEventLiveData.value
+            dispatchError(
+                if (event === null
+                    || event is ConnectivityEvent.ConnectivityAvailable)
+                    ERROR_GENERAL
+                else
+                    ERROR_NO_NETWORK,
+                e
+            )
             return
         }
 
