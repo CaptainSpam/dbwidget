@@ -4,8 +4,8 @@
     <dimen name="text_currentdonations">24sp</dimen>
     <dimen name="text_errorsimple">48sp</dimen>
     <dimen name="text_errorfull">16sp</dimen>
-    <dimen name="text_status">16sp</dimen>
+    <dimen name="text_status">12sp</dimen>
     <dimen name="text_nonfresh">10sp</dimen>
 
-    <dimen name="data_block_margin">16dp</dimen>
+    <dimen name="data_block_margin">12dp</dimen>
 </resources>

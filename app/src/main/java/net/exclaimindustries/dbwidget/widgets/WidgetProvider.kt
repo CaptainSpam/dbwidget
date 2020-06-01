@@ -293,30 +293,28 @@ class WidgetProvider : AppWidgetProvider() {
             resolveColor(context.resources, getShiftBackgroundColor(shift))
         )
 
-        if (event === null
-            || ((event is DataFetchService.Companion.ResultEvent.Fetched
-                    || event is DataFetchService.Companion.ResultEvent.Cached)
-                    && event.data === null)) {
-            // Either nothing's in the LiveData at all yet, or we somehow got a Fetched/Cached event
-            // with no data.  Either way, we're quite confused.
+        if (event?.data === null) {
+            // There's no data at all yet.  That means the error block goes on, at least.
             views.setViewVisibility(R.id.current_data, View.GONE)
-            views.setViewVisibility(R.id.status, View.GONE)
-            views.setViewVisibility(R.id.error, View.VISIBLE)
-        } else if ((event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
-            || event is DataFetchService.Companion.ResultEvent.ErrorGeneral)
-            && event.data === null) {
-            // If we've got an error with no data at all, report the error as text.
-            views.setViewVisibility(R.id.current_data, View.GONE)
-            views.setViewVisibility(R.id.status, View.VISIBLE)
-            views.setViewVisibility(R.id.error, View.GONE)
+            views.setViewVisibility(R.id.error_block, View.VISIBLE)
 
-            views.setTextViewText(
-                R.id.status,
-                context.getString(
-                    if (event is DataFetchService.Companion.ResultEvent.ErrorNoConnection)
-                        R.string.error_noconnection
-                    else
-                        R.string.error_general))
+            if(event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
+                || event is DataFetchService.Companion.ResultEvent.ErrorGeneral) {
+                // There's no data, but there IS an error!  If it's a Fetched or Cached response, we
+                // shouldn't have gotten here, so we can just assume we're still in the initial
+                // startup phase.
+                views.setViewVisibility(R.id.status, View.VISIBLE)
+
+                views.setTextViewText(
+                    R.id.status,
+                    context.getString(
+                        if (event is DataFetchService.Companion.ResultEvent.ErrorNoConnection)
+                            R.string.error_noconnection
+                        else
+                            R.string.error_general))
+            } else {
+                views.setViewVisibility(R.id.status, View.GONE)
+            }
         } else {
             // The valid data block!  Start with the current time.
             val now = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
@@ -331,8 +329,7 @@ class WidgetProvider : AppWidgetProvider() {
 
             // Reset visibilities...
             views.setViewVisibility(R.id.current_data, View.VISIBLE)
-            views.setViewVisibility(R.id.status, View.GONE)
-            views.setViewVisibility(R.id.error, View.GONE)
+            views.setViewVisibility(R.id.error_block, View.GONE)
             views.setViewVisibility(R.id.nonfresh_error, View.GONE)
 
             // We always put the current donations up.

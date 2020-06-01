@@ -16,11 +16,40 @@
         android:scaleType="fitStart" />
 
     <LinearLayout
+        android:id="@+id/error_block"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_marginStart="@dimen/data_block_margin"
+        android:layout_marginEnd="@dimen/data_block_margin"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/error"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/error_huh"
+            android:textAlignment="center"
+            android:textAppearance="@style/ErrorText"
+            android:visibility="visible"
+            tools:text="Something's gone all kerflooey again." />
+
+        <TextView
+            android:id="@+id/status"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textAlignment="center"
+            android:textAppearance="@style/StatusText"
+            android:visibility="gone"
+            tools:text="(with new BONUS TEXT!)"/>
+    </LinearLayout>
+
+    <LinearLayout
         android:id="@+id/current_data"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="false"
         android:layout_centerInParent="true"
+        android:layout_marginStart="@dimen/data_block_margin"
         android:layout_marginEnd="@dimen/data_block_margin"
         android:orientation="vertical"
         android:visibility="gone">
@@ -58,26 +87,5 @@
             android:visibility="gone"
             tools:text="(haven't had fresh data in a while)"/>
     </LinearLayout>
-
-    <TextView
-        android:id="@+id/error"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="false"
-        android:layout_centerInParent="true"
-        android:text="@string/error_huh"
-        android:textAlignment="center"
-        android:textAppearance="@style/ErrorText"
-        android:visibility="visible"
-        tools:text="Something's gone all kerflooey again." />
-
-    <TextView
-        android:id="@+id/status"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:textAlignment="center"
-        android:textAppearance="@style/StatusText"
-        android:visibility="gone" />
 
 </RelativeLayout>
