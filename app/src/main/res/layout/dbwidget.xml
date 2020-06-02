@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/widget"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#000000">
@@ -12,7 +13,9 @@
         android:layout_alignParentStart="true"
         android:layout_centerVertical="true"
         android:alpha=".5"
+        android:clickable="false"
         android:contentDescription="@string/acc_banner"
+        android:focusable="false"
         android:scaleType="fitStart" />
 
     <LinearLayout
@@ -22,12 +25,16 @@
         android:layout_centerInParent="true"
         android:layout_marginStart="@dimen/data_block_margin"
         android:layout_marginEnd="@dimen/data_block_margin"
+        android:clickable="false"
+        android:focusable="false"
         android:orientation="vertical">
 
         <TextView
             android:id="@+id/error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
             android:text="@string/error_huh"
             android:textAlignment="center"
             android:textAppearance="@style/ErrorText"
@@ -38,10 +45,12 @@
             android:id="@+id/status"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
             android:textAlignment="center"
             android:textAppearance="@style/StatusText"
             android:visibility="gone"
-            tools:text="(with new BONUS TEXT!)"/>
+            tools:text="(with new BONUS TEXT!)" />
     </LinearLayout>
 
     <LinearLayout
@@ -51,6 +60,8 @@
         android:layout_centerInParent="true"
         android:layout_marginStart="@dimen/data_block_margin"
         android:layout_marginEnd="@dimen/data_block_margin"
+        android:clickable="false"
+        android:focusable="false"
         android:orientation="vertical"
         android:visibility="gone">
 
@@ -58,6 +69,8 @@
             android:id="@+id/current_total"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
             android:textAlignment="center"
             android:textAppearance="@style/CurrentDonationsText"
             tools:text="$123,456.78" />
@@ -66,6 +79,8 @@
             android:id="@+id/hours_bussed"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
             android:textAlignment="center"
             android:textAppearance="@style/MainText"
             tools:text="67 HOURS OF 133 SO FAR" />
@@ -74,6 +89,8 @@
             android:id="@+id/to_next_hour"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
             android:textAlignment="center"
             android:textAppearance="@style/MainText"
             tools:text="NEXT HOUR: $271.11" />
@@ -82,6 +99,8 @@
             android:id="@+id/nonfresh_error"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:clickable="false"
+            android:focusable="false"
             android:textAlignment="center"
             android:textAppearance="@style/NonFreshErrorText"
             android:visibility="gone"

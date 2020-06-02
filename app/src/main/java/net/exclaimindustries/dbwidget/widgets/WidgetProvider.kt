@@ -9,6 +9,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.content.res.Resources
+import android.net.Uri
 import android.os.Build
 import android.os.SystemClock
 import android.text.format.DateUtils
@@ -292,6 +293,16 @@ class WidgetProvider : AppWidgetProvider() {
             "setBackgroundColor",
             resolveColor(context.resources, getShiftBackgroundColor(shift))
         )
+
+        // If the user clicks anywhere on the widget, go to the DB website.  Even if that reveals
+        // that its data may disagree with ours.
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            0,
+            Intent(Intent.ACTION_VIEW, Uri.parse("https://www.desertbus.org")),
+            0
+        )
+        views.setOnClickPendingIntent(R.id.widget, pendingIntent)
 
         if (event?.data === null) {
             // There's no data at all yet.  That means the error block goes on, at least.
