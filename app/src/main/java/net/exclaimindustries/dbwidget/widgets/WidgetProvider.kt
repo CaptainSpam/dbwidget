@@ -415,8 +415,8 @@ class WidgetProvider : AppWidgetProvider() {
                     views.setTextViewText(
                         R.id.nonfresh_error, context.getString(
                             R.string.error_nonfresh, DateUtils.getRelativeTimeSpanString(
-                                now.timeInMillis,
                                 data.fetchedAtMillis,
+                                now.timeInMillis,
                                 DateUtils.MINUTE_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_RELATIVE
                             )
