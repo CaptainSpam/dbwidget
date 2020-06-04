@@ -56,50 +56,56 @@ class WidgetProvider : AppWidgetProvider() {
         /** This does whatever needs doing for the alarm. */
         class AlarmReceiver : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
-                if(isNovember()) {
-                    Log.d(DEBUG_TAG, "ALARM!!!!  Enqueueing work!")
-                    // Tell the service to try a fetch.  That will fire off updates on the LiveData
-                    // object for the widget to find later.  It'll be hilarious, trust me.
-                    DataFetchService.enqueueWork(
-                        context,
-                        Intent(DataFetchService.ACTION_FETCH_DATA)
-                    )
-                } else {
-                    Log.d(DEBUG_TAG, "ALARM!!!!  It's still not November!")
-                    // If it's still not November, lie to the service and claim there's an update.
-                    // That'll update the banner background if need be.
-                    context.sendBroadcast(
-                        Intent(DataFetchService.ACTION_DATA_FETCHED).setClass(
-                            context,
-                            WidgetProvider::class.java
-                        )
-                    )
-                }
+                Log.d(DEBUG_TAG, "ALARM!!!!  Enqueueing work!")
+                // Tell the service to try a fetch.  That will fire off updates on the LiveData
+                // object for the widget to find later.  It'll be hilarious, trust me.
+                DataFetchService.enqueueWork(
+                    context,
+                    Intent(DataFetchService.ACTION_FETCH_DATA)
+                )
 
-                // In any case, reschedule for later down the line.
+                // Then, reschedule for later down the line.
                 scheduleAlarm(context)
             }
         }
 
         /**
-         * Determines if it's November or not.  If it IS November, that means we schedule the next
-         * update for one minute from now and make that alarm do an actual fetch.  If it's NOT
-         * November, the updates come only at shift changes (to update the banner) and do NOT call
-         * for another data fetch.
+         * Determines if a faster update schedule (every minute, as opposed to every six hours) is
+         * needed.  The basic logic is:
          *
-         * Note that last part about the data fetch; for the purposes of this function, if there is
-         * no data yet (either because this is the first run since boot or there was a fetch error
-         * before actual data came in), then it IS "November", meaning fetches should happen every
-         * minute until the problem is cleared up.
+         * * If there is no valid event yet, a fast update *IS* needed.
+         * * If there is a valid event but it contains no valid data, a fast update *IS* needed.
+         * * If there is valid data and the start date is in the future, a fast update *IS* needed.
+         * * If there is valid data, the start date is in the past, and the current donations
+         *   indicate the end of the run (plus thank-you time) is in the future, a fast update *IS*
+         *   needed.
+         * * Otherwise (meaning there's valid data, the latest run is over, and we don't know when
+         *   the next one begins), a fast update *is NOT* needed.
          */
-        private fun isNovember(): Boolean = Calendar.getInstance()
-            .get(Calendar.MONTH) == Calendar.NOVEMBER
-                || DataFetchService.Companion.ResultEventLiveData.value?.data === null
+        private fun needsFastUpdate(): Boolean {
+            val data = DataFetchService.Companion.ResultEventLiveData.value?.data
 
+            // Funny thing is, all of those cases neatly condense into this.
+            return (data === null || endPlusThankYouMillis(data) > Date().time)
+        }
+
+        /**
+         * The start of the run indicated by the data, plus the total number of hours that will be
+         * bussed according to the current donations, plus a few extra hours for thank-you time.
+         */
+        private fun endPlusThankYouMillis(data: DataFetchService.Companion.ResultData): Long =
+            data.runStartTimeMillis + ((data.totalHours + THANK_YOU_HOURS) * MILLIS_PER_HOUR)
+
+        /**
+         * Schedules the next alarm.  The time of said alarm depends on if we need fresh data
+         * quickly or not.
+         *
+         * @see needsFastUpdate
+         */
         private fun scheduleAlarm(context: Context) {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
-            if(isNovember()) {
+            if(needsFastUpdate()) {
                 Log.d(
                     DEBUG_TAG,
                     "Setting alarm for ${SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS}..."
@@ -119,9 +125,9 @@ class WidgetProvider : AppWidgetProvider() {
                     )
                 )
             } else {
-                // If it's NOT November (and we have valid, non-error data), just schedule an alarm
-                // for the next time the banner needs to update.
-                Log.d(DEBUG_TAG, "It's not November; scheduling for the next banner update...")
+                // If we don't need per-minute updates, just schedule an alarm for the next time the
+                // banner needs to update.
+                Log.d(DEBUG_TAG, "Don't need a fast update; scheduling for the next banner update...")
 
                 // The resolution we're dealing with in this check is the span of a month, so a
                 // difference of a few time zones is trivial.  We can therefore always use Pacific
@@ -154,6 +160,10 @@ class WidgetProvider : AppWidgetProvider() {
             }
         }
 
+        /**
+         * Shuts off the alarm.  Should be called at shutdown time.  Note that the alarms normally
+         * don't automatically repeat.
+         */
         private fun cancelAlarm(context: Context) {
             Log.d(DEBUG_TAG, "Canceling the alarm...")
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -168,11 +178,17 @@ class WidgetProvider : AppWidgetProvider() {
             )
         }
 
+        /** The right honorable Desert Bus for Hope shifts. */
         sealed class DBShift {
+            /** Dawn Guard, the guardian of morning. */
             object DawnGuard: DBShift()
+            /** Alpha Flight, the promise of a glorious afternoon. */
             object AlphaFlight: DBShift()
+            /** Night Watch, the protector of the night. */
             object NightWatch: DBShift()
+            /** Zeta Shift, where we don't even know, man. */
             object ZetaShift: DBShift()
+            /** Omega Shift, when it all comes down to the end. */
             object OmegaShift: DBShift()
         }
 
@@ -328,15 +344,9 @@ class WidgetProvider : AppWidgetProvider() {
             }
         } else {
             // The valid data block!  Start with the current time.
-            val now = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+            val nowMillis = Date().time
 
             val data = event.data!!
-
-            // Then, a new Calendar object for the end of the run, plus a few bonus hours to account
-            // for Thank You Time running well over.
-            val endPlusThankYou = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
-            endPlusThankYou.timeInMillis = data.runStartTimeMillis
-            endPlusThankYou.add(Calendar.HOUR, data.totalHours + THANK_YOU_HOURS)
 
             // Reset visibilities...
             views.setViewVisibility(R.id.current_data, View.VISIBLE)
@@ -347,25 +357,23 @@ class WidgetProvider : AppWidgetProvider() {
             views.setTextViewText(R.id.current_total,
                 "\$${DecimalFormat("###,###,###,###.00").format(data.currentDonations)}")
 
-            if(now.get(Calendar.MONTH) < Calendar.NOVEMBER
-                || now.timeInMillis > endPlusThankYou.timeInMillis) {
-                // If this is before November OR we're past the end of the run, display the data in
-                // the past tense.
+            if(nowMillis > endPlusThankYouMillis(data)) {
+                // If we're past the end of the last-known run, display the data in the past tense.
                 views.setTextViewText(
                     R.id.hours_bussed,
                     context.getString(R.string.hours_bussed_end, data.totalHours)
                 )
                 views.setViewVisibility(R.id.to_next_hour, View.GONE)
-            } else if(now.timeInMillis < data.runStartTimeMillis) {
-                // If it's November and we're before the start of the run (implying we know the
-                // start of the run and we're waiting for it), display the data in the future tense.
+            } else if(nowMillis < data.runStartTimeMillis) {
+                // If we're before the start of the run (implying we know the start of the run and
+                // we're waiting for it), display the data in the future tense.
                 views.setTextViewText(
                     R.id.hours_bussed,
                     context.getString(
                         R.string.hours_until_bus,
                         DateUtils.getRelativeTimeSpanString(
                             data.runStartTimeMillis,
-                            now.timeInMillis,
+                            nowMillis,
                             DateUtils.MINUTE_IN_MILLIS,
                             DateUtils.FORMAT_ABBREV_RELATIVE
                         )
@@ -384,12 +392,12 @@ class WidgetProvider : AppWidgetProvider() {
                     )
                 )
             } else {
-                // The run's on!  Full data, now!  Go go go!
+                // Otherwise, the run's on!  Full data, now!  Go go go!
                 views.setTextViewText(
                     R.id.hours_bussed,
                     context.getString(
                         R.string.hours_bussed,
-                        (now.timeInMillis - data.runStartTimeMillis) / MILLIS_PER_HOUR,
+                        (nowMillis - data.runStartTimeMillis) / MILLIS_PER_HOUR,
                         data.totalHours
                     )
                 )
@@ -410,13 +418,13 @@ class WidgetProvider : AppWidgetProvider() {
                 // fresh data, let the user know.
                 if ((event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
                             || event is DataFetchService.Companion.ResultEvent.ErrorGeneral)
-                    && now.timeInMillis - data.fetchedAtMillis > ERROR_TIMEOUT_MILLIS) {
+                    && nowMillis - data.fetchedAtMillis > ERROR_TIMEOUT_MILLIS) {
                     views.setViewVisibility(R.id.nonfresh_error, View.VISIBLE)
                     views.setTextViewText(
                         R.id.nonfresh_error, context.getString(
                             R.string.error_nonfresh, DateUtils.getRelativeTimeSpanString(
                                 data.fetchedAtMillis,
-                                now.timeInMillis,
+                                nowMillis,
                                 DateUtils.MINUTE_IN_MILLIS,
                                 DateUtils.FORMAT_ABBREV_RELATIVE
                             )
