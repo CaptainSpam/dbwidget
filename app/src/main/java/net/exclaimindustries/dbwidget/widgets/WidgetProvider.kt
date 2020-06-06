@@ -320,7 +320,10 @@ class WidgetProvider : AppWidgetProvider() {
         )
         views.setOnClickPendingIntent(R.id.widget, pendingIntent)
 
-        if (event?.data === null) {
+        // Extract the event data, if there is any.
+        val data = event?.data
+
+        if (data === null) {
             // There's no data at all yet.  That means the error block goes on, at least.
             views.setViewVisibility(R.id.current_data, View.GONE)
             views.setViewVisibility(R.id.error_block, View.VISIBLE)
@@ -345,8 +348,6 @@ class WidgetProvider : AppWidgetProvider() {
         } else {
             // The valid data block!  Start with the current time.
             val nowMillis = Date().time
-
-            val data = event.data!!
 
             // Reset visibilities...
             views.setViewVisibility(R.id.current_data, View.VISIBLE)
