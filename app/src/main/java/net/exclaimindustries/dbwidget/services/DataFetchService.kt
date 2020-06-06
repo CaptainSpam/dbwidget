@@ -260,12 +260,12 @@ class DataFetchService : JobIntentService() {
                 // If it throws THIS time, don't catch it; we've got a legit problem now and the
                 // caller should bail out to an error response.
                 httpGet = HttpGet(getStatsUrl(year - 1))
-                Log.d(DEBUG_TAG, "404'd; trying stats fetch on ${httpGet.uri}...")
+                Log.d(DEBUG_TAG, "404'd; backing off a year and trying stats fetch on ${httpGet.uri}...")
                 return JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
                     .getLong("Year Start Actual UNIX Time") * 1000
             } else {
                 // If it's NOT a 404 (or is some other exception), just throw it back.
-                Log.d(DEBUG_TAG, "That was a complete failure:", e)
+                Log.e(DEBUG_TAG, "Fetching stats was a failure:", e)
                 throw e
             }
         }

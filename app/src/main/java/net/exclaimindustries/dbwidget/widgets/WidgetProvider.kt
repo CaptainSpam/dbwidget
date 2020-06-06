@@ -85,6 +85,8 @@ class WidgetProvider : AppWidgetProvider() {
         private fun needsFastUpdate(): Boolean {
             val data = DataFetchService.Companion.ResultEventLiveData.value?.data
 
+            Log.d(DEBUG_TAG, "Checking fast update; ${if (data === null) "null" else endPlusThankYouMillis(data)} against ${Date().time}")
+
             // Funny thing is, all of those cases neatly condense into this.
             return (data === null || endPlusThankYouMillis(data) > Date().time)
         }
@@ -126,13 +128,10 @@ class WidgetProvider : AppWidgetProvider() {
                 )
             } else {
                 // If we don't need per-minute updates, just schedule an alarm for the next time the
-                // banner needs to update.
-                Log.d(DEBUG_TAG, "Don't need a fast update; scheduling for the next banner update...")
-
-                // The resolution we're dealing with in this check is the span of a month, so a
-                // difference of a few time zones is trivial.  We can therefore always use Pacific
-                // Time here, which will come in handy when rescheduling the alarm for banner
-                // updates.
+                // banner needs to update.  The resolution we're dealing with in this check is the
+                // span of a month, so a difference of a few time zones is trivial.  We can
+                // therefore always use Pacific Time here, which will come in handy when
+                // rescheduling the alarm for banner updates.
                 val cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"))
 
                 when(cal.get(Calendar.HOUR_OF_DAY)) {
@@ -146,6 +145,8 @@ class WidgetProvider : AppWidgetProvider() {
                 }
                 cal.set(Calendar.MINUTE, 0)
                 cal.set(Calendar.SECOND, 0)
+
+                Log.d(DEBUG_TAG, "Setting alarm for the next banner update (${cal.timeInMillis})...")
 
                 alarmManager.set(
                     AlarmManager.RTC,
@@ -161,8 +162,8 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         /**
-         * Shuts off the alarm.  Should be called at shutdown time.  Note that the alarms normally
-         * don't automatically repeat.
+         * Shuts off the alarm.  Should be called at shutdown time.  Note that the alarms don't
+         * automatically repeat.
          */
         private fun cancelAlarm(context: Context) {
             Log.d(DEBUG_TAG, "Canceling the alarm...")
