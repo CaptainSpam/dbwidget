@@ -19,6 +19,6 @@
          but in the interests of completeness... -->
     <plurals name="hours_bussed_end">
         <item quantity="one">The bus drove for %1$d hour</item>
-        <item quantity="many">The bus drove for %1$d hours</item>
+        <item quantity="other">The bus drove for %1$d hours</item>
     </plurals>
 </resources>
