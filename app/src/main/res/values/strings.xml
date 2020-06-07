@@ -6,7 +6,6 @@
 
     <string name="hours_bussed">%1$d HOURS OF %2$d SO FAR</string>
     <string name="to_next_hour">NEXT HOUR: %1$s</string>
-    <string name="hours_bussed_end">The bus drove for %1$d hours</string>
     <string name="hours_until_bus">The bus departs %1$s</string>
 
     <string name="error_huh">Waiting for data…</string>
@@ -15,4 +14,11 @@
     <string name="error_nonfresh">(haven\'t been able to get fresh data since %1$s)</string>
 
     <string name="acc_banner">Shift banner</string>
+
+    <!-- I'll be honest, I really hope we're never in a situation where we only bus for one hour,
+         but in the interests of completeness... -->
+    <plurals name="hours_bussed_end">
+        <item quantity="one">The bus drove for %1$d hour</item>
+        <item quantity="many">The bus drove for %1$d hours</item>
+    </plurals>
 </resources>
