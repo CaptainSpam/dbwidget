@@ -363,9 +363,11 @@ class WidgetProvider : AppWidgetProvider() {
                 // If we're past the end of the last-known run, display the data in the past tense.
                 views.setTextViewText(
                     R.id.hours_bussed,
-                    context.resources.getQuantityString(R.plurals.hours_bussed_end,
+                    context.resources.getQuantityString(
+                        R.plurals.hours_bussed_end,
                         data.totalHours,
-                        data.totalHours)
+                        data.totalHours
+                    )
                 )
                 views.setViewVisibility(R.id.to_next_hour, View.GONE)
             } else if(nowMillis < data.runStartTimeMillis) {
@@ -397,12 +399,13 @@ class WidgetProvider : AppWidgetProvider() {
                 )
             } else {
                 // Otherwise, the run's on!  Full data, now!  Go go go!
+                val hoursBussed = ((nowMillis - data.runStartTimeMillis) / MILLIS_PER_HOUR).toInt()
+
                 views.setTextViewText(
                     R.id.hours_bussed,
-                    context.getString(
-                        R.string.hours_bussed,
-                        (nowMillis - data.runStartTimeMillis) / MILLIS_PER_HOUR,
-                        data.totalHours
+                    context.resources.getQuantityString(
+                        R.plurals.hours_bussed,
+                        hoursBussed, hoursBussed, data.totalHours
                     )
                 )
                 views.setViewVisibility(R.id.to_next_hour, View.VISIBLE)

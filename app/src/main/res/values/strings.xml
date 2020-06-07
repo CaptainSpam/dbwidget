@@ -4,7 +4,6 @@
 
     <string name="app_name">Desert Bus for Hope Widget</string>
 
-    <string name="hours_bussed">%1$d HOURS OF %2$d SO FAR</string>
     <string name="to_next_hour">NEXT HOUR: %1$s</string>
     <string name="hours_until_bus">The bus departs %1$s</string>
 
@@ -20,5 +19,10 @@
     <plurals name="hours_bussed_end">
         <item quantity="one">The bus drove for %1$d hour</item>
         <item quantity="other">The bus drove for %1$d hours</item>
+    </plurals>
+
+    <plurals name="hours_bussed">
+        <item quantity="one">%1$d HOUR OF %2$d SO FAR</item>
+        <item quantity="other">%1$d HOURS OF %2$d SO FAR</item>
     </plurals>
 </resources>
