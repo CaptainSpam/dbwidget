@@ -363,7 +363,9 @@ class WidgetProvider : AppWidgetProvider() {
                 // If we're past the end of the last-known run, display the data in the past tense.
                 views.setTextViewText(
                     R.id.hours_bussed,
-                    context.resources.getQuantityText(R.plurals.hours_bussed_end, data.totalHours)
+                    context.resources.getQuantityString(R.plurals.hours_bussed_end,
+                        data.totalHours,
+                        data.totalHours)
                 )
                 views.setViewVisibility(R.id.to_next_hour, View.GONE)
             } else if(nowMillis < data.runStartTimeMillis) {
