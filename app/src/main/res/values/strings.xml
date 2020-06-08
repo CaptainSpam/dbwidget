@@ -1,26 +1,61 @@
 <resources>
+    <!-- Label for the (currently-nonexistent) configuration activity.  Most likely does not require
+         translation yet; if that activity ever exists, it will likely need more strings than what
+         are in here. -->
     <string name="label_configure">Widget Configurator</string>
+    <!-- Label for the fetch service.  This will show up mostly in debugging and in anything that
+         lists all the services running on the device. -->
     <string name="label_fetchservice">DB Widget Data Fetch Service</string>
 
+    <!-- Name of the app.  Will appear in the system's app list (but, since there's no launcher
+         activity, it likely won't appear in the launcher list). -->
     <string name="app_name">Desert Bus for Hope Widget</string>
 
+    <!-- How much money is needed to reach the next hour of bussing.  Will be the third line
+         displayed for either an in-progress run or a known future run (below hours_bussed or
+         hours_until_bus).  Should be all-caps where appropriate to match the style in the actual DB
+         overlay. -->
     <string name="to_next_hour">NEXT HOUR: %1$s</string>
+    <!-- Amount of time until the start of the next run, phrased as the amount of time until the bus
+         departs.  The filled-in string is taken from DateUtils.getRelativeTimeSpanString(), meaning
+         that will be translated by Android.  In English, it phrases it in terms of "In X days", "In
+         X hours", etc, falling back to the month and day (i.e. "November 7") past a certain
+         threshold.  I am uncertain how that is handled in other languages. -->
     <string name="hours_until_bus">The bus departs %1$s</string>
 
+    <!-- String displayed before any useful data has been fetched.  The widget will start with this
+         until data comes in. -->
     <string name="error_huh">Waiting for data…</string>
+    <!-- String displayed in smaller text underneath error_huh if there is no useful data, an
+         attempt to fetch data resulted in an error, and the app has determined the reason is that
+         there is no network connection at present.  Remember, the error_huh string WILL remain
+         visible above this. -->
     <string name="error_noconnection">(looks like there\'s no network connection?)</string>
+    <!-- String displayed in smaller text underneath error_huh if there is no useful data, and an
+         attempt to fetch data resulted in a general error not covered by any other error.  Should
+         most likely be phrased as if the widget is still waiting for data and hasn't given up yet.
+         Remember, the error_huh string WILL remain visible above this. -->
     <string name="error_general">(still waiting…)</string>
+    <!-- String displayed in smaller text underneath to_next_hour while Desert Bus is in progress,
+         there was valid data before (which is presently being displayed), but that data has become
+         stale due to being unable to retrieve anything new.  This string will not appear until at
+         least ten minutes have passed without an update.  See hours_until_bus for discussion about
+         the filled-in string. -->
     <string name="error_nonfresh">(haven\'t been able to get fresh data since %1$s)</string>
 
+    <!-- Accessibility string labeling the banner image. -->
     <string name="acc_banner">Shift banner</string>
 
-    <!-- I'll be honest, I really hope we're never in a situation where we only bus for one hour,
-         but in the interests of completeness... -->
+    <!-- Plural string for the amount of hours the bus drove in the most recent completed run, past
+         tense.  Will be displayed below the final donation amount for that run. -->
     <plurals name="hours_bussed_end">
         <item quantity="one">The bus drove for %1$d hour</item>
         <item quantity="other">The bus drove for %1$d hours</item>
     </plurals>
 
+    <!-- Plural string corresponding to the "X hours of Y so far" text on the actual DB overlay.
+         Will be the second line displayed for an in-progress run (below the current donation
+         amount).  Should be in all-caps, where appropriate. -->
     <plurals name="hours_bussed">
         <item quantity="one">%1$d HOUR OF %2$d SO FAR</item>
         <item quantity="other">%1$d HOURS OF %2$d SO FAR</item>
