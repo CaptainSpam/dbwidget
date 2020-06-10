@@ -2,6 +2,8 @@ package net.exclaimindustries.dbwidget.services
 
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.os.Build
 import android.util.Log
 import androidx.core.app.JobIntentService
 import androidx.lifecycle.LiveData
@@ -186,10 +188,8 @@ class DataFetchService : JobIntentService() {
             omegaShift = fetchOmegaShift()
         } catch (e: Exception) {
             Log.e(DEBUG_TAG, "Exception when fetching data:", e)
-            val event = ConnectivityEventLiveData.value
             dispatchError(
-                if (event === null
-                    || event is ConnectivityEvent.ConnectivityAvailable)
+                if (isNetworkConnected())
                     ERROR_GENERAL
                 else
                     ERROR_NO_NETWORK,
@@ -206,6 +206,19 @@ class DataFetchService : JobIntentService() {
             DonationConverter.toNextHourFromDonationAmount(currentDonations),
             omegaShift
         )
+    }
+
+    private fun isNetworkConnected(): Boolean {
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val event = ConnectivityEventLiveData.value
+            return event === null || event is ConnectivityEvent.ConnectivityAvailable
+        } else {
+            // If we're before Lollipop, we need to do this synchronously.
+            @Suppress("DEPRECATION") val networkInfo =
+                (getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager).activeNetworkInfo
+            @Suppress("DEPRECATION")
+            return networkInfo !== null && networkInfo.isConnected
+        }
     }
 
     private fun fetchCurrentDonations(): Double {

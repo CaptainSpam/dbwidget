@@ -4,6 +4,8 @@ import android.app.Application
 import android.content.Context
 import android.net.*
 import android.net.NetworkCapabilities.NET_CAPABILITY_INTERNET
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.lifecycle.LiveData
 
 /**
@@ -26,7 +28,11 @@ class ConnectionStateAwareApplication : Application() {
 
         /**
          * The LiveData thingy that sends out connectivity events.  Observe this to be on your way.
+         *
+         * Note that this depends on functionality not introduced until Lollipop.  You will need to
+         * API-guard any calls to this.
          */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         object ConnectivityEventLiveData : LiveData<ConnectivityEvent>() {
             internal fun notify(event: ConnectivityEvent) {
                 postValue(event)
@@ -34,6 +40,7 @@ class ConnectionStateAwareApplication : Application() {
         }
 
         /** Internal callback listener.  This does the listening. */
+        @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
         private class ApplicationNetworkCallback :
             ConnectivityManager.NetworkCallback() {
 
@@ -51,13 +58,18 @@ class ConnectionStateAwareApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
-        val connectivityManager =
-            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
-        // Register the callback and hope for the best!
-        connectivityManager.registerNetworkCallback(
-            NetworkRequest.Builder().addCapability(NET_CAPABILITY_INTERNET).build(),
-            ApplicationNetworkCallback()
-        )
+        // None of this existed before Lollipop, so if this is before then, this class effectively
+        // does nothing at all.
+        if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            val connectivityManager =
+                getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+
+            // Register the callback and hope for the best!
+            connectivityManager.registerNetworkCallback(
+                NetworkRequest.Builder().addCapability(NET_CAPABILITY_INTERNET).build(),
+                ApplicationNetworkCallback()
+            )
+        }
     }
 }
