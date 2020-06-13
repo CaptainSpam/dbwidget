@@ -43,6 +43,24 @@ class DataFetchService : JobIntentService() {
         private const val OMEGA_CHECK_URL = "${URL_PREFIX}Resources/isitomegashift.html"
 
         /**
+         * The prefix to all data URLs using http instead of https.  This is solely for
+         * compatibility with Android v19 or lower, as they don't support TLS 1.2 (technically v16
+         * and up does, but it's disabled by default).
+         */
+        private const val URL_PREFIX_LEGACY = "http://vst.ninja/"
+
+        /** URL to get the current donation total (legacy). */
+        private const val CURRENT_TOTAL_URL_LEGACY = "${URL_PREFIX_LEGACY}milestones/latestTotal"
+
+        /** URL to get the stats (legacy).  Replace "<YEAR>" with the actual numbered DB. */
+        private const val STATS_URL_BASE_LEGACY =
+            "${URL_PREFIX_LEGACY}DB<YEAR>/data/DB<YEAR>_stats.json"
+
+        /** URL to tell if it's Omega Shift (legacy). */
+        private const val OMEGA_CHECK_URL_LEGACY =
+            "${URL_PREFIX_LEGACY}Resources/isitomegashift.html"
+
+        /**
          * The offset used to determine the current numbered Desert Bus.  DB1 was in 2007, meaning
          * we subtract 2006 from 2007 to get 1, and so on.
          */
@@ -65,6 +83,9 @@ class DataFetchService : JobIntentService() {
 
         const val ERROR_GENERAL = 1
         const val ERROR_NO_NETWORK = 2
+
+        private fun canUseHttps(): Boolean =
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT_WATCH
 
         /** Convenience method for enqueuing work in to this service. */
         fun enqueueWork(context: Context, work: Intent) {
@@ -111,7 +132,10 @@ class DataFetchService : JobIntentService() {
 
             // The stats URL uses DB labels that are numbered SEQUENTIALLY, not by "official" name
             // (that is, the Desert Bus that happened in 2017 is DB11, not DB2017).
-            return STATS_URL_BASE.replace("<YEAR>", actualYear.toString())
+            return (if (canUseHttps()) STATS_URL_BASE else STATS_URL_BASE_LEGACY).replace(
+                "<YEAR>",
+                actualYear.toString()
+            )
         }
 
         /** The data from a successful fetch. */
@@ -224,7 +248,7 @@ class DataFetchService : JobIntentService() {
     private fun fetchCurrentDonations(): Double {
         // If something throws here, we'll just let onHandleWork handle it.
         val httpClient = HttpClientBuilder.create().build()
-        val httpGet = HttpGet(CURRENT_TOTAL_URL)
+        val httpGet = HttpGet(if(canUseHttps()) CURRENT_TOTAL_URL else CURRENT_TOTAL_URL_LEGACY)
         val handler = BasicResponseHandler()
 
         Log.d(DEBUG_TAG, "Fetching current donations...")
@@ -241,7 +265,7 @@ class DataFetchService : JobIntentService() {
         return try {
             // If it IS November, Omega Shift is a simple call that returns 1 or 0.
             val httpClient = HttpClientBuilder.create().build()
-            val httpGet = HttpGet(OMEGA_CHECK_URL)
+            val httpGet = HttpGet(if(canUseHttps()) OMEGA_CHECK_URL else OMEGA_CHECK_URL_LEGACY)
             val handler = BasicResponseHandler()
             Log.d(DEBUG_TAG, "Fetching Omega Shift...")
             httpClient.execute(httpGet, handler).trim() === "1"
