@@ -14,4 +14,7 @@
     <color name="background_nightwatch">#1574b7</color>
     <color name="background_zetashift">#603987</color>
     <color name="background_omegashift">#000000</color>
+
+    <color name="background_betaflight">#566949</color>
+    <color name="background_duskguard">#191760</color>
 </resources>
