@@ -63,4 +63,12 @@
       android:strokeWidth="1.45521"
       android:fillColor="#e6e363"
       android:strokeColor="#00000000"/>
+  <path
+      android:pathData="M0,56.8095l0,-56.8095l1.5339,-0l0,56.8095z"
+      android:strokeWidth="1.4552"
+      android:fillColor="#6f789a"/>
+  <path
+      android:pathData="M55.2756,56.8095l0,-56.8095l1.5339,-0l0,56.8095z"
+      android:strokeWidth="1.4552"
+      android:fillColor="#6f789a"/>
 </vector>
