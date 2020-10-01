@@ -50,10 +50,10 @@
     <string name="pref_bee_shed_title">Rustproof Bee Shed Mode</string>
     <!-- Text displayed in the configure screen if the Rustproof Bee Shed setting is toggled on.
          Describes that the widget will use Beta Flight and Dusk Guard's banners. -->
-    <string name="pref_bee_shed_on">Use Beta Flight and Dusk Guard banners</string>
+    <string name="pref_bee_shed_on">Will use Beta Flight and Dusk Guard banners</string>
     <!-- Text displayed in the configure screen if the Rustproof Bee Shed setting is toggled off.
          Describes that the widget will use Alpha Flight and Night Watch's banners. -->
-    <string name="pref_bee_shed_off">Use Alpha Flight and Night Watch banners</string>
+    <string name="pref_bee_shed_off">Will use Alpha Flight and Night Watch banners</string>
 
     <!-- Label on button in the configure screen that will create the widget with the given
          settings. -->
