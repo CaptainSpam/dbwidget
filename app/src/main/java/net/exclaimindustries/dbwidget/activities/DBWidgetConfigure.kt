@@ -67,7 +67,7 @@ class DBWidgetConfigure : FragmentActivity() {
             this,
             appWidgetManager,
             appWidgetId,
-            if (event?.data?.omegaShift == true) WidgetProvider.Companion.DBShift.OmegaShift
+            if (event?.data?.omegaShift == true) WidgetProvider.Companion.DBShift.OMEGASHIFT
             else WidgetProvider.getShift(
                 Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")),
                 beeShed

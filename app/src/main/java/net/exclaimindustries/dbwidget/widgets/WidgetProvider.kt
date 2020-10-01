@@ -183,53 +183,53 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         /** The right honorable Desert Bus for Hope shifts. */
-        sealed class DBShift {
+        enum class DBShift {
             /** Dawn Guard, the guardian of morning. */
-            object DawnGuard: DBShift()
+            DAWNGUARD,
             /** Alpha Flight, the promise of a glorious afternoon. */
-            object AlphaFlight: DBShift()
+            ALPHAFLIGHT,
             /** Night Watch, the protector of the night. */
-            object NightWatch: DBShift()
+            NIGHTWATCH,
             /** Zeta Shift, where we don't even know, man. */
-            object ZetaShift: DBShift()
+            ZETASHIFT,
             /** Omega Shift, when it all comes down to the end. */
-            object OmegaShift: DBShift()
+            OMEGASHIFT,
             /** Beta Flight, when the bees just show up for some reason. */
-            object BetaFlight: DBShift()
+            BETAFLIGHT,
             /** Dusk Guard, because bees?  The lore's still kinda hazy there. */
-            object DuskGuard: DBShift()
+            DUSKGUARD
         }
 
         /** Gets the shift associated with the given Calendar. */
         fun getShift(cal: Calendar, beeShed: Boolean = false): DBShift = when (cal.get(Calendar.HOUR_OF_DAY)) {
-            in 0..5 -> DBShift.ZetaShift
-            in 6..11 -> DBShift.DawnGuard
-            in 12..17 -> if(beeShed) DBShift.BetaFlight else DBShift.AlphaFlight
-            else -> if(beeShed) DBShift.DuskGuard else DBShift.NightWatch
+            in 0..5 -> DBShift.ZETASHIFT
+            in 6..11 -> DBShift.DAWNGUARD
+            in 12..17 -> if(beeShed) DBShift.BETAFLIGHT else DBShift.ALPHAFLIGHT
+            else -> if(beeShed) DBShift.DUSKGUARD else DBShift.NIGHTWATCH
         }
 
         /** Gets the banner Drawable associated with the given shift. */
         @DrawableRes
         private fun getShiftDrawable(shift: DBShift): Int = when (shift) {
-            is DBShift.DawnGuard -> R.drawable.dbdawnguard
-            is DBShift.AlphaFlight -> R.drawable.dbalphaflight
-            is DBShift.BetaFlight -> R.drawable.dbbetaflight
-            is DBShift.NightWatch -> R.drawable.dbnightwatch
-            is DBShift.DuskGuard -> R.drawable.dbduskguard
-            is DBShift.ZetaShift -> R.drawable.dbzetashift
-            is DBShift.OmegaShift -> R.drawable.dbomegashift
+            DBShift.DAWNGUARD -> R.drawable.dbdawnguard
+            DBShift.ALPHAFLIGHT -> R.drawable.dbalphaflight
+            DBShift.BETAFLIGHT -> R.drawable.dbbetaflight
+            DBShift.NIGHTWATCH -> R.drawable.dbnightwatch
+            DBShift.DUSKGUARD -> R.drawable.dbduskguard
+            DBShift.ZETASHIFT -> R.drawable.dbzetashift
+            DBShift.OMEGASHIFT -> R.drawable.dbomegashift
         }
 
         /** Gets the background color associated with the given shift. */
         @ColorRes
         private fun getShiftBackgroundColor(shift: DBShift): Int = when (shift) {
-            is DBShift.DawnGuard -> R.color.background_dawnguard
-            is DBShift.AlphaFlight -> R.color.background_alphaflight
-            is DBShift.BetaFlight -> R.color.background_betaflight
-            is DBShift.NightWatch -> R.color.background_nightwatch
-            is DBShift.DuskGuard -> R.color.background_duskguard
-            is DBShift.ZetaShift -> R.color.background_zetashift
-            is DBShift.OmegaShift -> R.color.background_omegashift
+            DBShift.DAWNGUARD -> R.color.background_dawnguard
+            DBShift.ALPHAFLIGHT -> R.color.background_alphaflight
+            DBShift.BETAFLIGHT -> R.color.background_betaflight
+            DBShift.NIGHTWATCH -> R.color.background_nightwatch
+            DBShift.DUSKGUARD -> R.color.background_duskguard
+            DBShift.ZETASHIFT -> R.color.background_zetashift
+            DBShift.OMEGASHIFT -> R.color.background_omegashift
         }
 
         /**
@@ -272,7 +272,7 @@ class WidgetProvider : AppWidgetProvider() {
                         context,
                         appWidgetManager,
                         id,
-                        if (event?.data?.omegaShift == true) DBShift.OmegaShift
+                        if (event?.data?.omegaShift == true) DBShift.OMEGASHIFT
                         else getShift(
                             Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")),
                             appWidgetManager.getAppWidgetOptions(id).getBoolean(
