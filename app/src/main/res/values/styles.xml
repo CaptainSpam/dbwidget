@@ -6,6 +6,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:fontFamily">@font/montserrat_medium</item>
     </style>
 
     <style name="MainText">
@@ -37,6 +38,30 @@
 
     <style name="NonFreshErrorText" parent="MainText">
         <item name="android:textSize">@dimen/text_nonfresh</item>
+    </style>
+
+    <style name="ConfigTitle">
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textSize">@dimen/text_config_title</item>
+        <item name="android:fontFamily">@font/montserrat_semibold</item>
+    </style>
+
+    <style name="ConfigCreateButton">
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textSize">@dimen/text_config_create</item>
+        <item name="android:fontFamily">@font/montserrat_semibold</item>
+    </style>
+
+    <style name="ConfigSetting">
+        <item name="android:textColor">?android:textColorPrimary</item>
+        <item name="android:textSize">@dimen/text_config_setting</item>
+        <item name="android:fontFamily">@font/montserrat_medium</item>
+    </style>
+
+    <style name="ConfigSettingDescription">
+        <item name="android:textColor">?android:textColorSecondary</item>
+        <item name="android:textSize">@dimen/text_config_setting_description</item>
+        <item name="android:fontFamily">@font/montserrat_medium</item>
     </style>
 
 </resources>

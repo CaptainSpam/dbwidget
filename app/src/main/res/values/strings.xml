@@ -1,17 +1,16 @@
 <resources>
-    <!-- Label for the (currently-nonexistent) configuration activity.  Most likely does not require
-         translation yet; if that activity ever exists, it will likely need more strings than what
-         are in here. -->
+    <!-- Label for the configuration activity.  Likely will not be displayed in the interface and
+         therefore does not require translation. -->
     <string name="label_configure">Widget Configurator</string>
     <!-- Label for the fetch service.  This will show up mostly in debugging and in anything that
-         lists all the services running on the device. -->
+         lists all the services running on the device.  Likely does not require translation. -->
     <string name="label_fetchservice">DB Widget Data Fetch Service</string>
 
     <!-- Name of the app.  Will appear in the system's app list (but, since there's no launcher
-         activity, it likely won't appear in the launcher list). -->
+         activity, it likely won't appear in the launcher list) and the configuration screen. -->
     <string name="app_name">Desert Bus for Hope Widget</string>
 
-    <!-- How much money is needed to reach the next hour of bussing.  Will be the third line
+    <!-- How much money is needed to reach the next hour of driving.  Will be the third line
          displayed for either an in-progress run or a known future run (below hours_bussed or
          hours_until_bus).  Should be all-caps where appropriate to match the style in the actual DB
          overlay. -->
@@ -45,6 +44,20 @@
 
     <!-- Accessibility string labeling the banner image. -->
     <string name="acc_banner">Shift banner</string>
+
+    <!-- Title of the configure setting for Rustproof Bee Shed banners.  This likely does not need
+         translating, as it is a proper name. -->
+    <string name="pref_bee_shed_title">Rustproof Bee Shed Mode</string>
+    <!-- Text displayed in the configure screen if the Rustproof Bee Shed setting is toggled on.
+         Describes that the widget will use Beta Flight and Dusk Guard's banners. -->
+    <string name="pref_bee_shed_on">Use Beta Flight and Dusk Guard banners</string>
+    <!-- Text displayed in the configure screen if the Rustproof Bee Shed setting is toggled off.
+         Describes that the widget will use Alpha Flight and Night Watch's banners. -->
+    <string name="pref_bee_shed_off">Use Alpha Flight and Night Watch banners</string>
+
+    <!-- Label on button in the configure screen that will create the widget with the given
+         settings. -->
+    <string name="create_widget">Create Widget</string>
 
     <!-- Plural string for the amount of hours the bus drove in the most recent completed run, past
          tense.  Will be displayed below the final donation amount for that run. -->

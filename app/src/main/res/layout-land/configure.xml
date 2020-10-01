@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:baselineAligned="false"
+    android:orientation="horizontal"
+    tools:context=".activities.DBWidgetConfigure">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_margin="@dimen/general_config_margin"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="@string/app_name"
+            android:textAlignment="center"
+            android:textAppearance="@style/ConfigTitle" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="@dimen/general_config_margin"
+        android:layout_weight="1">
+
+        <TextView
+            android:id="@+id/bee_shed_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/bee_shed_switch"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:textAppearance="@style/ConfigSettingDescription"
+            tools:text="@string/pref_bee_shed_off" />
+
+        <androidx.appcompat.widget.SwitchCompat
+            android:id="@+id/bee_shed_switch"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_alignParentTop="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:onClick="toggleBeeShed"
+            android:text="@string/pref_bee_shed_title"
+            android:textAppearance="@style/ConfigSetting" />
+
+        <Button
+            android:id="@+id/create_widget"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:layout_gravity="center_horizontal"
+            android:onClick="createWidget"
+            android:padding="@dimen/create_widget_padding"
+            android:text="@string/create_widget"
+            android:textAppearance="@style/ConfigCreateButton" />
+    </RelativeLayout>
+</LinearLayout>

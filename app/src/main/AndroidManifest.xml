@@ -34,8 +34,12 @@
         </receiver>
 
         <activity
-            android:name=".activities.WidgetConfigure"
-            android:label="@string/label_configure" />
+            android:name=".activities.DBWidgetConfigure"
+            android:label="@string/label_configure">
+            <intent-filter>
+                <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
+            </intent-filter>
+        </activity>
 
         <service
             android:name=".services.DataFetchService"

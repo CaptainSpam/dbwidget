@@ -53,6 +53,9 @@ class WidgetProvider : AppWidgetProvider() {
         /** Action name for the alarm. */
         private const val CHECK_ALARM_ACTION = "net.exclaimindustries.dbwidget.CHECK_ALARM"
 
+        /** Option flag for using Rustproof Bee Shed banners. */
+        const val BEE_SHED_BANNERS = "useBeeShed"
+
         /** This does whatever needs doing for the alarm. */
         class AlarmReceiver : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
@@ -191,14 +194,18 @@ class WidgetProvider : AppWidgetProvider() {
             object ZetaShift: DBShift()
             /** Omega Shift, when it all comes down to the end. */
             object OmegaShift: DBShift()
+            /** Beta Flight, when the bees just show up for some reason. */
+            object BetaFlight: DBShift()
+            /** Dusk Guard, because bees?  The lore's still kinda hazy there. */
+            object DuskGuard: DBShift()
         }
 
         /** Gets the shift associated with the given Calendar. */
-        private fun getShift(cal: Calendar): DBShift = when (cal.get(Calendar.HOUR_OF_DAY)) {
+        fun getShift(cal: Calendar, beeShed: Boolean = false): DBShift = when (cal.get(Calendar.HOUR_OF_DAY)) {
             in 0..5 -> DBShift.ZetaShift
             in 6..11 -> DBShift.DawnGuard
-            in 12..17 -> DBShift.AlphaFlight
-            else -> DBShift.NightWatch
+            in 12..17 -> if(beeShed) DBShift.BetaFlight else DBShift.AlphaFlight
+            else -> if(beeShed) DBShift.DuskGuard else DBShift.NightWatch
         }
 
         /** Gets the banner Drawable associated with the given shift. */
@@ -206,7 +213,9 @@ class WidgetProvider : AppWidgetProvider() {
         private fun getShiftDrawable(shift: DBShift): Int = when (shift) {
             is DBShift.DawnGuard -> R.drawable.dbdawnguard
             is DBShift.AlphaFlight -> R.drawable.dbalphaflight
+            is DBShift.BetaFlight -> R.drawable.dbbetaflight
             is DBShift.NightWatch -> R.drawable.dbnightwatch
+            is DBShift.DuskGuard -> R.drawable.dbduskguard
             is DBShift.ZetaShift -> R.drawable.dbzetashift
             is DBShift.OmegaShift -> R.drawable.dbomegashift
         }
@@ -216,7 +225,9 @@ class WidgetProvider : AppWidgetProvider() {
         private fun getShiftBackgroundColor(shift: DBShift): Int = when (shift) {
             is DBShift.DawnGuard -> R.color.background_dawnguard
             is DBShift.AlphaFlight -> R.color.background_alphaflight
+            is DBShift.BetaFlight -> R.color.background_betaflight
             is DBShift.NightWatch -> R.color.background_nightwatch
+            is DBShift.DuskGuard -> R.color.background_duskguard
             is DBShift.ZetaShift -> R.color.background_zetashift
             is DBShift.OmegaShift -> R.color.background_omegashift
         }
@@ -233,6 +244,202 @@ class WidgetProvider : AppWidgetProvider() {
                 res.getColor(color, null)
             else
                 res.getColor(color)
+
+        /**
+         * Render all the widgets known to the given Context (which should hopefully mean the DB
+         * Widget instance).
+         */
+        private fun renderWidgets(context: Context) {
+            val event = DataFetchService.Companion.ResultEventLiveData.value
+            val appWidgetManager = AppWidgetManager.getInstance(context)
+            val appWidgetIds =
+                appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))
+
+            Log.d(DEBUG_TAG, "Rendering for data: $event")
+
+            appWidgetIds.forEach { id ->
+                run {
+                    val bundle = appWidgetManager.getAppWidgetOptions(id)
+                    Log.d(
+                        DEBUG_TAG,
+                        "Widget $id ${if (bundle.containsKey(BEE_SHED_BANNERS)) "DOES NOT HAVE" else "has"} a bee shed value (returning ${
+                            bundle.getBoolean(
+                                BEE_SHED_BANNERS, false
+                            )
+                        })"
+                    )
+                    renderWidget(
+                        context,
+                        appWidgetManager,
+                        id,
+                        if (event?.data?.omegaShift == true) DBShift.OmegaShift
+                        else getShift(
+                            Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")),
+                            appWidgetManager.getAppWidgetOptions(id).getBoolean(
+                                BEE_SHED_BANNERS, false
+                            )
+                        ),
+                        event
+                    )
+                }
+            }
+        }
+
+        /** Actually render a widget. */
+        fun renderWidget(
+            context: Context,
+            appWidgetManager: AppWidgetManager,
+            id: Int,
+            shift: DBShift,
+            event: DataFetchService.Companion.ResultEvent?
+        ) {
+            val views = RemoteViews(context.packageName, R.layout.dbwidget)
+            views.setImageViewResource(R.id.banner, getShiftDrawable(shift))
+            views.setInt(
+                R.id.banner,
+                "setBackgroundColor",
+                resolveColor(context.resources, getShiftBackgroundColor(shift))
+            )
+
+            // If the user clicks anywhere on the widget, go to the DB website.  Even if that
+            // reveals that its data may disagree with ours.
+            val pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                Intent(Intent.ACTION_VIEW, Uri.parse("https://www.desertbus.org")),
+                0
+            )
+            views.setOnClickPendingIntent(R.id.widget, pendingIntent)
+
+            // Extract the event data, if there is any.
+            val data = event?.data
+
+            if (data === null) {
+                // There's no data at all yet.  That means the error block goes on, at least.
+                views.setViewVisibility(R.id.current_data, View.GONE)
+                views.setViewVisibility(R.id.error_block, View.VISIBLE)
+
+                if(event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
+                    || event is DataFetchService.Companion.ResultEvent.ErrorGeneral) {
+                    // There's no data, but there IS an error!  If it's a Fetched or Cached
+                    // response, we shouldn't have gotten here, so we can just assume we're still in
+                    // the initial startup phase.
+                    views.setViewVisibility(R.id.status, View.VISIBLE)
+
+                    views.setTextViewText(
+                        R.id.status,
+                        context.getString(
+                            if (event is DataFetchService.Companion.ResultEvent.ErrorNoConnection)
+                                R.string.error_noconnection
+                            else
+                                R.string.error_general))
+                } else {
+                    views.setViewVisibility(R.id.status, View.GONE)
+                }
+            } else {
+                // The valid data block!  Start with the current time.
+                val nowMillis = Date().time
+
+                // Reset visibilities...
+                views.setViewVisibility(R.id.current_data, View.VISIBLE)
+                views.setViewVisibility(R.id.error_block, View.GONE)
+                views.setViewVisibility(R.id.nonfresh_error, View.GONE)
+
+                // We always put the current donations up.
+                views.setTextViewText(
+                    R.id.current_total,
+                    "\$${DecimalFormat("###,###,###,###.00").format(data.currentDonations)}"
+                )
+
+                if(nowMillis > endPlusThankYouMillis(data)) {
+                    // If we're past the end of the last-known run, display the data in the past
+                    // tense.
+                    views.setTextViewText(
+                        R.id.hours_bussed,
+                        context.resources.getQuantityString(
+                            R.plurals.hours_bussed_end,
+                            data.totalHours,
+                            data.totalHours
+                        )
+                    )
+                    views.setViewVisibility(R.id.to_next_hour, View.GONE)
+                } else if(nowMillis < data.runStartTimeMillis) {
+                    // If we're before the start of the run (implying we know the start of the run
+                    // and we're waiting for it), display the data in the future tense.
+                    views.setTextViewText(
+                        R.id.hours_bussed,
+                        context.getString(
+                            R.string.hours_until_bus,
+                            DateUtils.getRelativeTimeSpanString(
+                                data.runStartTimeMillis,
+                                nowMillis,
+                                DateUtils.MINUTE_IN_MILLIS,
+                                DateUtils.FORMAT_ABBREV_RELATIVE
+                            )
+                        )
+                    )
+                    views.setViewVisibility(R.id.to_next_hour, View.VISIBLE)
+                    views.setTextViewText(
+                        R.id.to_next_hour,
+                        context.getString(
+                            R.string.to_next_hour,
+                            "\$${DecimalFormat("###,###,###,###.00").format(
+                                DonationConverter.toNextHourFromDonationAmount(
+                                    data.currentDonations
+                                )
+                            )}"
+                        )
+                    )
+                } else {
+                    // Otherwise, the run's on!  Full data, now!  Go go go!
+                    val hoursBussed =
+                        ((nowMillis - data.runStartTimeMillis) / MILLIS_PER_HOUR).toInt()
+
+                    views.setTextViewText(
+                        R.id.hours_bussed,
+                        context.resources.getQuantityString(
+                            R.plurals.hours_bussed,
+                            hoursBussed, hoursBussed, data.totalHours
+                        )
+                    )
+                    views.setViewVisibility(R.id.to_next_hour, View.VISIBLE)
+                    views.setTextViewText(
+                        R.id.to_next_hour,
+                        context.getString(
+                            R.string.to_next_hour,
+                            "\$${DecimalFormat("###,###,###,###.00").format(
+                                DonationConverter.toNextHourFromDonationAmount(
+                                    data.currentDonations
+                                )
+                            )}"
+                        )
+                    )
+
+                    // Now, if this is an error and it's been over ERROR_TIMEOUT_MILLIS since the
+                    // last fresh data, let the user know.
+                    if ((event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
+                                || event is DataFetchService.Companion.ResultEvent.ErrorGeneral)
+                        && nowMillis - data.fetchedAtMillis > ERROR_TIMEOUT_MILLIS) {
+                        views.setViewVisibility(R.id.nonfresh_error, View.VISIBLE)
+                        views.setTextViewText(
+                            R.id.nonfresh_error, context.getString(
+                                R.string.error_nonfresh, DateUtils.getRelativeTimeSpanString(
+                                    data.fetchedAtMillis,
+                                    nowMillis,
+                                    DateUtils.MINUTE_IN_MILLIS,
+                                    DateUtils.FORMAT_ABBREV_RELATIVE
+                                )
+                            )
+                        )
+                    } else {
+                        views.setViewVisibility(R.id.nonfresh_error, View.GONE)
+                    }
+                }
+            }
+
+            // With everything set, update the widget!
+            appWidgetManager.updateAppWidget(id, views)
+        }
     }
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -280,170 +487,5 @@ class WidgetProvider : AppWidgetProvider() {
             context,
             Intent(DataFetchService.ACTION_FETCH_DATA)
         )
-    }
-
-    private fun renderWidgets(context: Context) {
-        val event = DataFetchService.Companion.ResultEventLiveData.value
-        val appWidgetManager = AppWidgetManager.getInstance(context)
-        val shift =
-            if (event?.data?.omegaShift == true) DBShift.OmegaShift
-            else getShift(Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")))
-        val appWidgetIds =
-            appWidgetManager.getAppWidgetIds(ComponentName(context, WidgetProvider::class.java))
-
-        Log.d(DEBUG_TAG, "Rendering for data: $event")
-
-        appWidgetIds.forEach { id -> renderWidget(context, appWidgetManager, id, shift, event) }
-    }
-
-    private fun renderWidget(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        id: Int,
-        shift: DBShift,
-        event: DataFetchService.Companion.ResultEvent?
-    ) {
-        val views = RemoteViews(context.packageName, R.layout.dbwidget)
-        views.setImageViewResource(R.id.banner, getShiftDrawable(shift))
-        views.setInt(
-            R.id.banner,
-            "setBackgroundColor",
-            resolveColor(context.resources, getShiftBackgroundColor(shift))
-        )
-
-        // If the user clicks anywhere on the widget, go to the DB website.  Even if that reveals
-        // that its data may disagree with ours.
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            0,
-            Intent(Intent.ACTION_VIEW, Uri.parse("https://www.desertbus.org")),
-            0
-        )
-        views.setOnClickPendingIntent(R.id.widget, pendingIntent)
-
-        // Extract the event data, if there is any.
-        val data = event?.data
-
-        if (data === null) {
-            // There's no data at all yet.  That means the error block goes on, at least.
-            views.setViewVisibility(R.id.current_data, View.GONE)
-            views.setViewVisibility(R.id.error_block, View.VISIBLE)
-
-            if(event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
-                || event is DataFetchService.Companion.ResultEvent.ErrorGeneral) {
-                // There's no data, but there IS an error!  If it's a Fetched or Cached response, we
-                // shouldn't have gotten here, so we can just assume we're still in the initial
-                // startup phase.
-                views.setViewVisibility(R.id.status, View.VISIBLE)
-
-                views.setTextViewText(
-                    R.id.status,
-                    context.getString(
-                        if (event is DataFetchService.Companion.ResultEvent.ErrorNoConnection)
-                            R.string.error_noconnection
-                        else
-                            R.string.error_general))
-            } else {
-                views.setViewVisibility(R.id.status, View.GONE)
-            }
-        } else {
-            // The valid data block!  Start with the current time.
-            val nowMillis = Date().time
-
-            // Reset visibilities...
-            views.setViewVisibility(R.id.current_data, View.VISIBLE)
-            views.setViewVisibility(R.id.error_block, View.GONE)
-            views.setViewVisibility(R.id.nonfresh_error, View.GONE)
-
-            // We always put the current donations up.
-            views.setTextViewText(R.id.current_total,
-                "\$${DecimalFormat("###,###,###,###.00").format(data.currentDonations)}")
-
-            if(nowMillis > endPlusThankYouMillis(data)) {
-                // If we're past the end of the last-known run, display the data in the past tense.
-                views.setTextViewText(
-                    R.id.hours_bussed,
-                    context.resources.getQuantityString(
-                        R.plurals.hours_bussed_end,
-                        data.totalHours,
-                        data.totalHours
-                    )
-                )
-                views.setViewVisibility(R.id.to_next_hour, View.GONE)
-            } else if(nowMillis < data.runStartTimeMillis) {
-                // If we're before the start of the run (implying we know the start of the run and
-                // we're waiting for it), display the data in the future tense.
-                views.setTextViewText(
-                    R.id.hours_bussed,
-                    context.getString(
-                        R.string.hours_until_bus,
-                        DateUtils.getRelativeTimeSpanString(
-                            data.runStartTimeMillis,
-                            nowMillis,
-                            DateUtils.MINUTE_IN_MILLIS,
-                            DateUtils.FORMAT_ABBREV_RELATIVE
-                        )
-                    )
-                )
-                views.setViewVisibility(R.id.to_next_hour, View.VISIBLE)
-                views.setTextViewText(
-                    R.id.to_next_hour,
-                    context.getString(
-                        R.string.to_next_hour,
-                        "\$${DecimalFormat("###,###,###,###.00").format(
-                            DonationConverter.toNextHourFromDonationAmount(
-                                data.currentDonations
-                            )
-                        )}"
-                    )
-                )
-            } else {
-                // Otherwise, the run's on!  Full data, now!  Go go go!
-                val hoursBussed = ((nowMillis - data.runStartTimeMillis) / MILLIS_PER_HOUR).toInt()
-
-                views.setTextViewText(
-                    R.id.hours_bussed,
-                    context.resources.getQuantityString(
-                        R.plurals.hours_bussed,
-                        hoursBussed, hoursBussed, data.totalHours
-                    )
-                )
-                views.setViewVisibility(R.id.to_next_hour, View.VISIBLE)
-                views.setTextViewText(
-                    R.id.to_next_hour,
-                    context.getString(
-                        R.string.to_next_hour,
-                        "\$${DecimalFormat("###,###,###,###.00").format(
-                            DonationConverter.toNextHourFromDonationAmount(
-                                data.currentDonations
-                            )
-                        )}"
-                    )
-                )
-
-                // Now, if this is an error and it's been over ERROR_TIMEOUT_MILLIS since the last
-                // fresh data, let the user know.
-                if ((event is DataFetchService.Companion.ResultEvent.ErrorNoConnection
-                            || event is DataFetchService.Companion.ResultEvent.ErrorGeneral)
-                    && nowMillis - data.fetchedAtMillis > ERROR_TIMEOUT_MILLIS) {
-                    views.setViewVisibility(R.id.nonfresh_error, View.VISIBLE)
-                    views.setTextViewText(
-                        R.id.nonfresh_error, context.getString(
-                            R.string.error_nonfresh, DateUtils.getRelativeTimeSpanString(
-                                data.fetchedAtMillis,
-                                nowMillis,
-                                DateUtils.MINUTE_IN_MILLIS,
-                                DateUtils.FORMAT_ABBREV_RELATIVE
-                            )
-                        )
-                    )
-                } else {
-                    views.setViewVisibility(R.id.nonfresh_error, View.GONE)
-                }
-            }
-        }
-
-        // With everything set, update the widget!
-        appWidgetManager.updateAppWidget(id, views)
     }
 }
