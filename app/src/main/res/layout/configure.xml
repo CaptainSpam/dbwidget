@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/prefs"
     android:layout_width="match_parent"
@@ -7,46 +8,58 @@
     android:layout_margin="@dimen/general_config_margin"
     tools:context=".activities.DBWidgetConfigure">
 
-    <Button
-        android:id="@+id/create_widget"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:onClick="createWidget"
-        android:padding="@dimen/create_widget_padding"
-        android:text="@string/create_widget"
-        android:textAppearance="@style/ConfigCreateButton" />
-
-    <TextView
-        android:id="@+id/bee_shed_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/bee_shed_switch"
-        android:layout_centerHorizontal="true"
-        android:layout_gravity="center_horizontal"
-        android:textAppearance="@style/ConfigSettingDescription"
-        tools:text="@string/pref_bee_shed_off" />
-
-    <androidx.appcompat.widget.SwitchCompat
-        android:id="@+id/bee_shed_switch"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:layout_gravity="center_horizontal"
-        android:onClick="toggleBeeShed"
-        android:text="@string/pref_bee_shed_title"
-        android:textAppearance="@style/ConfigSetting" />
-
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
         android:text="@string/app_name"
         android:textAlignment="center"
-        android:textAppearance="@style/ConfigTitle" />
+        android:textAppearance="@style/ConfigTitle"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-</RelativeLayout>
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/bee_shed_switch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:layout_gravity="center_horizontal"
+        android:onClick="toggleBeeShed"
+        android:text="@string/pref_bee_shed_title"
+        android:textAppearance="@style/ConfigSetting"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintRight_toLeftOf="@id/pref_icon_bee_shed"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:id="@+id/pref_icon_bee_shed"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/pref_icon_margin"
+        android:contentDescription="@string/acc_pref_bee_shed"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toRightOf="@+id/bee_shed_switch"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/pref_bee_shed_off"
+        tools:ignore="RtlHardcoded" />
+
+    <Button
+        android:id="@+id/create_widget"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:onClick="createWidget"
+        android:padding="@dimen/create_widget_padding"
+        android:text="@string/create_widget"
+        android:textAppearance="@style/ConfigCreateButton"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

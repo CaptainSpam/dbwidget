@@ -44,6 +44,8 @@
 
     <!-- Accessibility string labeling the banner image. -->
     <string name="acc_banner">Shift banner</string>
+    <!-- Accessibility string labeling the Rustproof Bee Shed preference icon. -->
+    <string name="acc_pref_bee_shed">Rustproof Bee Shed preference icon</string>
 
     <!-- Title of the configure setting for Rustproof Bee Shed banners.  This likely does not need
          translating, as it is a proper name. -->

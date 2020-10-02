@@ -3,9 +3,6 @@
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.DayNight">
         <!-- Customize your theme here. -->
-        <item name="colorPrimary">@color/colorPrimary</item>
-        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
-        <item name="colorAccent">@color/colorAccent</item>
         <item name="android:fontFamily">@font/montserrat_medium</item>
     </style>
 
@@ -57,11 +54,4 @@
         <item name="android:textSize">@dimen/text_config_setting</item>
         <item name="android:fontFamily">@font/montserrat_medium</item>
     </style>
-
-    <style name="ConfigSettingDescription">
-        <item name="android:textColor">?android:textColorSecondary</item>
-        <item name="android:textSize">@dimen/text_config_setting_description</item>
-        <item name="android:fontFamily">@font/montserrat_medium</item>
-    </style>
-
 </resources>

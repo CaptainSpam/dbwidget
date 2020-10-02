@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
-import android.widget.TextView
+import android.widget.ImageView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.FragmentActivity
 import net.exclaimindustries.dbwidget.R
@@ -25,7 +25,7 @@ class DBWidgetConfigure : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.configure)
         setResult(RESULT_CANCELED, getWidgetIntent())
-        updateBeeShedDescription()
+        updateBeeShedIcon()
     }
 
     private fun getWidgetId(): Int {
@@ -83,12 +83,12 @@ class DBWidgetConfigure : FragmentActivity() {
     fun toggleBeeShed(view: View) {
         if(view is SwitchCompat) {
             beeShed = view.isChecked
-            updateBeeShedDescription()
+            updateBeeShedIcon()
         }
     }
 
-    private fun updateBeeShedDescription() {
-        findViewById<TextView>(R.id.bee_shed_description)
-            ?.setText(if (beeShed) R.string.pref_bee_shed_on else R.string.pref_bee_shed_off)
+    private fun updateBeeShedIcon() {
+        findViewById<ImageView>(R.id.pref_icon_bee_shed)
+            ?.setImageResource(if (beeShed) R.drawable.pref_bee_shed_on else R.drawable.pref_bee_shed_off)
     }
 }

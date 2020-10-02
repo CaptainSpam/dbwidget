@@ -15,4 +15,6 @@
 
     <dimen name="general_config_margin">32dp</dimen>
     <dimen name="create_widget_padding">32dp</dimen>
+
+    <dimen name="pref_icon_margin">16dp</dimen>
 </resources>
