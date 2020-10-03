@@ -8,17 +8,15 @@ import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.content.res.Resources
 import android.net.Uri
-import android.os.Build
 import android.os.SystemClock
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.View
 import android.widget.RemoteViews
-import androidx.annotation.ColorInt
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.core.content.res.ResourcesCompat
 import net.exclaimindustries.dbwidget.R
 import net.exclaimindustries.dbwidget.services.DataFetchService
 import net.exclaimindustries.dbwidget.util.DonationConverter
@@ -233,19 +231,6 @@ class WidgetProvider : AppWidgetProvider() {
         }
 
         /**
-         * Resolves a color reference to an Int.  This is largely a convenience method that decides
-         * whether to use the proper two-param version of getColor if we're using Marshmallow or
-         * later, or use the deprecated single-param version if we're before Marshmallow.
-         */
-        @ColorInt
-        private fun resolveColor(res: Resources, @ColorRes color: Int): Int =
-            @Suppress("DEPRECATION")
-            if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-                res.getColor(color, null)
-            else
-                res.getColor(color)
-
-        /**
          * Render all the widgets known to the given Context (which should hopefully mean the DB
          * Widget instance).
          */
@@ -298,7 +283,7 @@ class WidgetProvider : AppWidgetProvider() {
             views.setInt(
                 R.id.banner,
                 "setBackgroundColor",
-                resolveColor(context.resources, getShiftBackgroundColor(shift))
+                ResourcesCompat.getColor(context.resources, getShiftBackgroundColor(shift), null)
             )
 
             // If the user clicks anywhere on the widget, go to the DB website.  Even if that
