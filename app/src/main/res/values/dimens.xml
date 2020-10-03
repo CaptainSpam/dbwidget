@@ -7,6 +7,7 @@
     <dimen name="text_nonfresh">10sp</dimen>
 
     <dimen name="text_config_title">24sp</dimen>
+    <dimen name="text_config_normal">14sp</dimen>
     <dimen name="text_config_create">16sp</dimen>
     <dimen name="text_config_setting">16sp</dimen>
     <dimen name="text_config_setting_description">12sp</dimen>
@@ -14,6 +15,7 @@
     <dimen name="data_block_margin">12dp</dimen>
 
     <dimen name="general_config_margin">32dp</dimen>
+    <dimen name="smaller_config_margin">16dp</dimen>
     <dimen name="create_widget_padding">32dp</dimen>
 
     <dimen name="pref_icon_margin">16dp</dimen>

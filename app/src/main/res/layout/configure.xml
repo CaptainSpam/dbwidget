@@ -6,18 +6,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_margin="@dimen/general_config_margin"
+    android:baselineAligned="false"
     tools:context=".activities.DBWidgetConfigure">
 
     <TextView
         android:id="@+id/title"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/smaller_config_margin"
         android:text="@string/app_name"
         android:textAlignment="center"
         android:textAppearance="@style/ConfigTitle"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toBottomOf="@+id/logo" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/bee_shed_switch"
@@ -26,26 +28,26 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true"
         android:layout_gravity="center_horizontal"
+        android:layout_marginBottom="@dimen/general_config_margin"
         android:onClick="toggleBeeShed"
         android:text="@string/pref_bee_shed_title"
         android:textAppearance="@style/ConfigSetting"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/create_widget"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintHorizontal_weight="1"
-        app:layout_constraintRight_toLeftOf="@id/pref_icon_bee_shed"
         app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintRight_toLeftOf="@id/pref_icon_bee_shed" />
 
     <ImageView
         android:id="@+id/pref_icon_bee_shed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/pref_icon_margin"
+        android:layout_marginBottom="@dimen/general_config_margin"
         android:contentDescription="@string/acc_pref_bee_shed"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/create_widget"
         app:layout_constraintLeft_toRightOf="@+id/bee_shed_switch"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@drawable/pref_bee_shed_off"
         tools:ignore="RtlHardcoded" />
 
@@ -61,5 +63,39 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent" />
+
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:contentDescription="@string/acc_logo"
+        android:src="@drawable/dbwidgeticon"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/author_string"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/smaller_config_margin"
+        android:text="@string/author"
+        android:textAlignment="center"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title" />
+
+    <TextView
+        android:id="@+id/disclaimer_string"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/smaller_config_margin"
+        android:text="@string/disclaimer"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_config_normal"
+        android:textStyle="italic"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/author_string" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

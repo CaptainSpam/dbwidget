@@ -46,6 +46,14 @@
     <string name="acc_banner">Shift banner</string>
     <!-- Accessibility string labeling the Rustproof Bee Shed preference icon. -->
     <string name="acc_pref_bee_shed">Rustproof Bee Shed preference icon</string>
+    <!-- Accessibility string labeling the logo on top of the preference screen. -->
+    <string name="acc_logo">Desert Bus for Hope Widget Logo</string>
+
+    <!-- Author credit line for me, Nicholas Killewald.  If you are translating this, I'll add in a
+         new string or set of strings for translators. -->
+    <string name="author">By Nicholas Killewald</string>
+    <!-- Disclaimer about how I am not actually officially related to Desert Bus for Hope. -->
+    <string name="disclaimer">(who is not actually related to Desert Bus for Hope in any official capacity)</string>
 
     <!-- Title of the configure setting for Rustproof Bee Shed banners.  This likely does not need
          translating, as it is a proper name. -->

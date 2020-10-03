@@ -6,46 +6,72 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:baselineAligned="false"
+    android:layout_margin="@dimen/general_config_margin"
     tools:context=".activities.DBWidgetConfigure">
-
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="329dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="@dimen/general_config_margin"
         android:text="@string/app_name"
         android:textAlignment="center"
         android:textAppearance="@style/ConfigTitle"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/logo"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5"
         tools:ignore="RtlHardcoded" />
 
+    <TextView
+        android:id="@+id/author_string"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/smaller_config_margin"
+        android:text="@string/author"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_config_normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/title"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5" />
+
+    <TextView
+        android:id="@+id/disclaimer_string"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/smaller_config_margin"
+        android:text="@string/disclaimer"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_config_normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/author_string"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5" />
 
     <androidx.appcompat.widget.SwitchCompat
         android:id="@+id/bee_shed_switch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/general_config_margin"
-        android:layout_marginRight="@dimen/general_config_margin"
+        android:layout_marginRight="@dimen/smaller_config_margin"
+        android:layout_marginBottom="@dimen/general_config_margin"
         android:onClick="toggleBeeShed"
         android:text="@string/pref_bee_shed_title"
         android:textAppearance="@style/ConfigSetting"
+        app:layout_constraintBottom_toTopOf="@id/create_widget"
         app:layout_constraintHorizontal_chainStyle="packed"
         app:layout_constraintRight_toLeftOf="@id/pref_icon_bee_shed"
-        app:layout_constraintTop_toTopOf="parent"
         tools:ignore="RtlHardcoded" />
 
     <ImageView
         android:id="@+id/pref_icon_bee_shed"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginLeft="@dimen/pref_icon_margin"
-        android:layout_marginTop="@dimen/general_config_margin"
+        android:layout_marginBottom="@dimen/general_config_margin"
         android:contentDescription="@string/acc_pref_bee_shed"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintLeft_toRightOf="@id/bee_shed_switch"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/create_widget"
         app:srcCompat="@drawable/pref_bee_shed_off"
         tools:ignore="RtlHardcoded" />
 
@@ -53,16 +79,25 @@
         android:id="@+id/create_widget"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginRight="106dp"
-        android:layout_marginBottom="@dimen/general_config_margin"
         android:onClick="createWidget"
         android:padding="@dimen/create_widget_padding"
         android:text="@string/create_widget"
         android:textAppearance="@style/ConfigCreateButton"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias=".825"
+        app:layout_constraintStart_toStartOf="parent"
         tools:ignore="RtlHardcoded" />
 
-
+    <ImageView
+        android:id="@+id/logo"
+        android:layout_width="0dp"
+        android:layout_height="140dp"
+        android:contentDescription="@string/acc_logo"
+        android:src="@drawable/dbwidgeticon"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
