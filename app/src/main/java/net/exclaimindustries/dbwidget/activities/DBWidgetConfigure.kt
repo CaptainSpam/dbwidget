@@ -3,8 +3,10 @@ package net.exclaimindustries.dbwidget.activities
 import android.appwidget.AppWidgetManager
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.util.Log
 import android.view.View
+import android.view.ViewTreeObserver
 import android.widget.ImageView
 import androidx.appcompat.widget.SwitchCompat
 import androidx.fragment.app.FragmentActivity
@@ -17,15 +19,51 @@ import java.util.*
 class DBWidgetConfigure : FragmentActivity() {
     private var beeShed = false
 
+    private lateinit var logo:ImageView
+
     companion object {
         private const val DEBUG_TAG = "DBWidgetConfigure"
     }
+
+    private lateinit var handler: Handler
+
+    private val rotationRunner: Runnable = Runnable { doRotation() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.configure)
         setResult(RESULT_CANCELED, getWidgetIntent())
         updateBeeShedIcon()
+
+        // Now, let's set a dumb easter egg in motion...
+        logo = findViewById(R.id.logo)
+
+        val vto = logo.viewTreeObserver
+        if(vto.isAlive) {
+            vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+                override fun onGlobalLayout() {
+                    if(vto.isAlive)
+                        vto.removeOnGlobalLayoutListener(this)
+                    // Set the pivot to not-quite-center.
+                    logo.pivotX = logo.measuredWidth * .40f
+                    logo.pivotY = logo.measuredHeight * .61f
+                }
+            })
+        }
+
+        handler = Handler(mainLooper)
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        handler.postDelayed(rotationRunner, 1000)
+    }
+
+    override fun onPause() {
+        super.onPause()
+
+        handler.removeCallbacks(rotationRunner)
     }
 
     private fun getWidgetId(): Int {
@@ -90,5 +128,11 @@ class DBWidgetConfigure : FragmentActivity() {
     private fun updateBeeShedIcon() {
         findViewById<ImageView>(R.id.pref_icon_bee_shed)
             ?.setImageResource(if (beeShed) R.drawable.pref_bee_shed_on else R.drawable.pref_bee_shed_off)
+    }
+
+    private fun doRotation() {
+        // Rotate it juuuuuuust a wee bit...
+        logo.rotation += 0.05f
+        handler.postDelayed(rotationRunner, 1000)
     }
 }
