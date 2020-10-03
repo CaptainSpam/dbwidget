@@ -6,9 +6,9 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.View
+import android.view.ViewGroup
 import android.view.ViewTreeObserver
-import android.widget.ImageView
-import androidx.appcompat.widget.SwitchCompat
+import android.widget.CompoundButton
 import androidx.fragment.app.FragmentActivity
 import net.exclaimindustries.dbwidget.R
 import net.exclaimindustries.dbwidget.services.DataFetchService
@@ -18,8 +18,6 @@ import java.util.*
 
 class DBWidgetConfigure : FragmentActivity() {
     private var beeShed = false
-
-    private lateinit var logo:ImageView
 
     companion object {
         private const val DEBUG_TAG = "DBWidgetConfigure"
@@ -33,20 +31,21 @@ class DBWidgetConfigure : FragmentActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.configure)
         setResult(RESULT_CANCELED, getWidgetIntent())
-        updateBeeShedIcon()
 
-        // Now, let's set a dumb easter egg in motion...
-        logo = findViewById(R.id.logo)
-
-        val vto = logo.viewTreeObserver
-        if(vto.isAlive) {
+        val vto = findViewById<ViewGroup>(R.id.prefs)?.viewTreeObserver
+        if(vto != null && vto.isAlive) {
             vto.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
                 override fun onGlobalLayout() {
                     if(vto.isAlive)
                         vto.removeOnGlobalLayoutListener(this)
-                    // Set the pivot to not-quite-center.
+                    // Let's set a dumb easter egg in motion.  Set the pivot to not-quite-center.
+                    val logo = findViewById<View>(R.id.logo)
                     logo.pivotX = logo.measuredWidth * .40f
                     logo.pivotY = logo.measuredHeight * .61f
+
+                    // Then, make sure the Rustproof Bee Shed icon is updated correctly once layout
+                    // hits.
+                    updateBeeShedIcon()
                 }
             })
         }
@@ -119,20 +118,27 @@ class DBWidgetConfigure : FragmentActivity() {
     }
 
     fun toggleBeeShed(view: View) {
-        if(view is SwitchCompat) {
-            beeShed = view.isChecked
-            updateBeeShedIcon()
-        }
+        updateBeeShedIcon()
     }
 
     private fun updateBeeShedIcon() {
-        findViewById<ImageView>(R.id.pref_icon_bee_shed)
-            ?.setImageResource(if (beeShed) R.drawable.pref_bee_shed_on else R.drawable.pref_bee_shed_off)
+        val view = findViewById<CompoundButton>(R.id.bee_shed_switch)
+
+        if(view != null) {
+            beeShed = view.isChecked
+            view.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                0,
+                0,
+                if (beeShed) R.drawable.pref_bee_shed_on else R.drawable.pref_bee_shed_off,
+                0
+            )
+        }
     }
 
     private fun doRotation() {
         // Rotate it juuuuuuust a wee bit...
-        logo.rotation += 0.05f
+        val logo = findViewById<View>(R.id.logo)
+        if(logo != null) logo.rotation += 0.05f
         handler.postDelayed(rotationRunner, 1000)
     }
 }
