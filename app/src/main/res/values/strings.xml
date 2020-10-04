@@ -7,7 +7,10 @@
     <string name="label_fetchservice">DB Widget Data Fetch Service</string>
 
     <!-- Name of the app.  Will appear in the system's app list (but, since there's no launcher
-         activity, it likely won't appear in the launcher list) and the configuration screen. -->
+         activity, it likely won't appear in the launcher list) and the configuration screen.  When
+         translating, remember that while, for instance, Desert Bus De L'Espoir *exists*, that's a
+         whole other event, and this widget refers specifically to the thing LoadingReadyRun puts on
+         every year.-->
     <string name="app_name">Desert Bus for Hope Widget</string>
 
     <!-- How much money is needed to reach the next hour of driving.  Will be the third line
