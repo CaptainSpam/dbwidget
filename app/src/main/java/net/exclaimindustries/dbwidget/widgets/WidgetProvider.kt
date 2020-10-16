@@ -16,7 +16,9 @@ import android.view.View
 import android.widget.RemoteViews
 import androidx.annotation.ColorRes
 import androidx.annotation.DrawableRes
+import androidx.core.content.edit
 import androidx.core.content.res.ResourcesCompat
+import androidx.preference.PreferenceManager
 import net.exclaimindustries.dbwidget.R
 import net.exclaimindustries.dbwidget.services.DataFetchService
 import net.exclaimindustries.dbwidget.util.DonationConverter
@@ -51,8 +53,21 @@ class WidgetProvider : AppWidgetProvider() {
         /** Action name for the alarm. */
         private const val CHECK_ALARM_ACTION = "net.exclaimindustries.dbwidget.CHECK_ALARM"
 
-        /** Option flag for using Rustproof Bee Shed banners. */
-        const val BEE_SHED_BANNERS = "useBeeShed"
+        /** Pref key fragment for using Rustproof Bee Shed banners. */
+        private const val PREF_BEESHED = "RustproofBeeShed"
+
+        /** The known prefs. */
+        enum class Prefs {
+            /** Corresponds to PREF_BEESHED. */
+            BEESHED,
+        }
+
+        /** Get the key for the given pref of the given widget ID. */
+        fun prefKeyFor(id: Int, pref: Prefs): String = "widget${id}${
+            when (pref) {
+                Prefs.BEESHED -> PREF_BEESHED
+            }
+        }"
 
         /** This does whatever needs doing for the alarm. */
         class AlarmReceiver : BroadcastReceiver() {
@@ -244,15 +259,7 @@ class WidgetProvider : AppWidgetProvider() {
 
             appWidgetIds.forEach { id ->
                 run {
-                    val bundle = appWidgetManager.getAppWidgetOptions(id)
-                    Log.d(
-                        DEBUG_TAG,
-                        "Widget $id ${if (bundle.containsKey(BEE_SHED_BANNERS)) "DOES NOT HAVE" else "has"} a bee shed value (returning ${
-                            bundle.getBoolean(
-                                BEE_SHED_BANNERS, false
-                            )
-                        })"
-                    )
+                    val prefs = PreferenceManager.getDefaultSharedPreferences(context)
                     renderWidget(
                         context,
                         appWidgetManager,
@@ -260,9 +267,7 @@ class WidgetProvider : AppWidgetProvider() {
                         if (event?.data?.omegaShift == true) DBShift.OMEGASHIFT
                         else getShift(
                             Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles")),
-                            appWidgetManager.getAppWidgetOptions(id).getBoolean(
-                                BEE_SHED_BANNERS, false
-                            )
+                            prefs.getBoolean(prefKeyFor(id, Prefs.BEESHED), false)
                         ),
                         event
                     )
@@ -448,6 +453,18 @@ class WidgetProvider : AppWidgetProvider() {
 
         // Also, render up.
         renderWidgets(context)
+    }
+
+    override fun onDeleted(context: Context, appWidgetIds: IntArray) {
+        // A widget's gone away, so we should clean up its prefs.
+        val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+
+        appWidgetIds.forEach{ id -> run {
+                prefs.edit {
+                    this.remove(prefKeyFor(id, Prefs.BEESHED))
+                }
+            }
+        }
     }
 
     override fun onDisabled(context: Context) {

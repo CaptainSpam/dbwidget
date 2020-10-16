@@ -9,7 +9,9 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.CompoundButton
+import androidx.core.content.edit
 import androidx.fragment.app.FragmentActivity
+import androidx.preference.PreferenceManager
 import net.exclaimindustries.dbwidget.R
 import net.exclaimindustries.dbwidget.services.DataFetchService
 import net.exclaimindustries.dbwidget.widgets.WidgetProvider
@@ -90,11 +92,19 @@ class DBWidgetConfigure : FragmentActivity() {
 
         Log.d(DEBUG_TAG, "Today's widget ID is $appWidgetId")
 
-        val appWidgetManager = AppWidgetManager.getInstance(this)
+        // Write out the setting to preferences.  Apparently, stuff written to WidgetProvider's
+        // option bundles isn't persisted, which seems odd.
+        val prefs = PreferenceManager.getDefaultSharedPreferences(this)
+        prefs.edit {
+            this.putBoolean(
+                WidgetProvider.prefKeyFor(
+                    appWidgetId,
+                    WidgetProvider.Companion.Prefs.BEESHED
+                ), beeShed
+            )
+        }
 
-        val widgetBundle = appWidgetManager.getAppWidgetOptions(appWidgetId)
-        widgetBundle.putBoolean(WidgetProvider.BEE_SHED_BANNERS, beeShed)
-        appWidgetManager.updateAppWidgetOptions(appWidgetId, widgetBundle)
+        val appWidgetManager = AppWidgetManager.getInstance(this)
 
         // Get the widget updated.  Remember, merely updating the options does NOT call for an
         // update!  Also, we have to call into WidgetProvider's companion stuff.  Fortunately, we
