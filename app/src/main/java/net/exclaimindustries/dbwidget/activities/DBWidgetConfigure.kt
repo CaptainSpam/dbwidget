@@ -68,8 +68,7 @@ class DBWidgetConfigure : FragmentActivity() {
     }
 
     private fun getWidgetId(): Int {
-        val extras = intent?.extras
-        return extras?.getInt(
+        return intent?.extras?.getInt(
             AppWidgetManager.EXTRA_APPWIDGET_ID,
             AppWidgetManager.INVALID_APPWIDGET_ID
         )
@@ -134,15 +133,12 @@ class DBWidgetConfigure : FragmentActivity() {
     private fun updateBeeShedIcon() {
         val view = findViewById<CompoundButton>(R.id.bee_shed_switch)
 
-        if(view != null) {
-            beeShed = view.isChecked
-            view.setCompoundDrawablesRelativeWithIntrinsicBounds(
-                0,
-                0,
-                if (beeShed) R.drawable.pref_bee_shed_on else R.drawable.pref_bee_shed_off,
-                0
-            )
-        }
+        view?.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            0,
+            0,
+            if (view.isChecked) R.drawable.pref_bee_shed_on else R.drawable.pref_bee_shed_off,
+            0
+        )
     }
 
     private fun doRotation() {
