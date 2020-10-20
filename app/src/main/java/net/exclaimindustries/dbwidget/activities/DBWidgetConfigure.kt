@@ -23,6 +23,10 @@ class DBWidgetConfigure : FragmentActivity() {
 
     companion object {
         private const val DEBUG_TAG = "DBWidgetConfigure"
+        private const val ROTATION_PIVOT_X = 0.40f
+        private const val ROTATION_PIVOT_Y = 0.61f
+        private const val ROTATION_AMOUNT_DEGREES = 0.05f
+        private const val ROTATION_TIME_MILLIS = 1000L
     }
 
     private lateinit var handler: Handler
@@ -42,8 +46,8 @@ class DBWidgetConfigure : FragmentActivity() {
                         vto.removeOnGlobalLayoutListener(this)
                     // Let's set a dumb easter egg in motion.  Set the pivot to not-quite-center.
                     val logo = findViewById<View>(R.id.logo)
-                    logo.pivotX = logo.measuredWidth * .40f
-                    logo.pivotY = logo.measuredHeight * .61f
+                    logo.pivotX = logo.measuredWidth * ROTATION_PIVOT_X
+                    logo.pivotY = logo.measuredHeight * ROTATION_PIVOT_Y
 
                     // Then, make sure the Rustproof Bee Shed icon is updated correctly once layout
                     // hits.
@@ -58,7 +62,7 @@ class DBWidgetConfigure : FragmentActivity() {
     override fun onResume() {
         super.onResume()
 
-        handler.postDelayed(rotationRunner, 1000)
+        handler.postDelayed(rotationRunner, ROTATION_TIME_MILLIS)
     }
 
     override fun onPause() {
@@ -144,7 +148,7 @@ class DBWidgetConfigure : FragmentActivity() {
     private fun doRotation() {
         // Rotate it juuuuuuust a wee bit...
         val logo = findViewById<View>(R.id.logo)
-        if(logo != null) logo.rotation += 0.05f
-        handler.postDelayed(rotationRunner, 1000)
+        if(logo != null) logo.rotation += ROTATION_AMOUNT_DEGREES
+        handler.postDelayed(rotationRunner, ROTATION_TIME_MILLIS)
     }
 }
