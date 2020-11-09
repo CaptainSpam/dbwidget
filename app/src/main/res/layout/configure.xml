@@ -81,4 +81,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/author_string" />
 
+    <TextView
+        android:id="@+id/translator_string"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/translator"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_config_normal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/disclaimer_string" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

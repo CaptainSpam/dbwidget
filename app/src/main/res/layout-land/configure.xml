@@ -48,6 +48,19 @@
         app:layout_constraintWidth_default="percent"
         app:layout_constraintWidth_percent="0.5" />
 
+    <TextView
+        android:id="@+id/translator_string"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="@string/translator"
+        android:textAlignment="center"
+        android:textSize="@dimen/text_config_normal"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/disclaimer_string"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5" />
+
     <CheckBox
         android:id="@+id/bee_shed_switch"
         android:layout_width="0dp"

@@ -86,4 +86,10 @@
         <item quantity="one">%1$d HOUR OF %2$d SO FAR</item>
         <item quantity="other">%1$d HOURS OF %2$d SO FAR</item>
     </plurals>
+
+    <!-- A credit for the translator.  Should be in a form similar to "(language) translation by
+         (name)".  Will appear below the disclaimer on the configurator.  Note that this string will
+         be blank for English, as I'm doing those strings, and I'm already credited as the author of
+         the widget itself. -->
+    <string name="translator"> </string>
 </resources>
