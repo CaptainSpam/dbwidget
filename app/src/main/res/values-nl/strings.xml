@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_configure">Widget Configurator</string>
+    <string name="label_fetchservice">DB Widget Data Fetch Service</string>
+    <string name="app_name">Desert Bus for Hope Widget</string>
+    <string name="to_next_hour">VOLGEND UUR: %1$s</string>
+    <string name="hours_until_bus">De bus vertrekt %1$s</string>
+    <string name="error_huh">Wachten op gegevens…</string>
+    <string name="error_noconnection">(het lijkt erop dat er geen internetverbinding is)</string>
+    <string name="error_general">(Nog steeds aan het wachten…)</string>
+    <string name="error_nonfresh">(de gegevens zijn het laatste geupdated op %1$s)</string>
+    <string name="acc_banner">Shift banner</string>
+    <string name="acc_pref_bee_shed">Rustproof Bee Shed voorkeurs icon</string>
+    <string name="acc_logo">Desert Bus for Hope Widget Logo</string>
+    <string name="author">Ontwikkeld door Nicholas Killewald</string>
+    <string name="disclaimer">(Die geen officiele relatie heeft met Desert Bus for Hope)</string>
+    <string name="pref_bee_shed_title">Rustproof Bee Shed Modus</string>
+    <string name="pref_bee_shed_on">Maakt gebruik van Beta Flight en Dusk Guard banners</string>
+    <string name="pref_bee_shed_off">Maakt gebruik van Alpha Flight en Night Watch banners</string>
+    <string name="create_widget">Widget Aanmaken</string>
+    <plurals name="hours_bussed_end">
+        <item quantity="one">De bus heeft %1$d uur gereden</item>
+        <item quantity="other">De bus heeft %1$d uur gereden</item>
+    </plurals>
+    <plurals name="hours_bussed">
+        <item quantity="one">UUR %1$d VAN %2$d TOT NU TOE</item>
+        <item quantity="other">UUR %1$d VAN %2$d TOT NU TOE</item>
+    </plurals>
+    <string name="translator">Nederlandse vertaling door Sven Dobbe</string>
+</resources>
