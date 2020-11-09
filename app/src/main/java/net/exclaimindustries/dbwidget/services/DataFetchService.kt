@@ -188,7 +188,7 @@ class DataFetchService : JobIntentService() {
             Log.e(DEBUG_TAG, "Exception when fetching data:", e)
             val event = ConnectivityEventLiveData.value
             dispatchError(
-                if (event === null
+                if (e is HttpResponseException || event === null
                     || event is ConnectivityEvent.ConnectivityAvailable)
                     ERROR_GENERAL
                 else
