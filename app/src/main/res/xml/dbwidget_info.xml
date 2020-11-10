@@ -5,7 +5,7 @@
     android:updatePeriodMillis="0"
     android:previewImage="@drawable/widgetpreview"
     android:initialLayout="@layout/dbwidget"
-    android:resizeMode="horizontal"
+    android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
     android:configure="net.exclaimindustries.dbwidget.activities.DBWidgetConfigure">
 </appwidget-provider>
