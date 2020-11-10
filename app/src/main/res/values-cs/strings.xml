@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_configure">Nastavení widgetu</string>
+    <string name="label_fetchservice">DB Widget Data Fetch Service</string>
+    <string name="app_name">Widget události Desert Bus for Hope</string>
+    <string name="to_next_hour">DALŠÍ HODINA: %1$s</string>
+    <string name="hours_until_bus">%1$s vyjíždíme</string>
+    <string name="error_huh">Čekám na data…</string>
+    <string name="error_noconnection">(vypadá to, že se nedaří připojit)</string>
+    <string name="error_general">(pořád čekám…)</string>
+    <string name="error_nonfresh">(data se naposled podařilo aktualizovat %1$s)</string>
+    <string name="acc_banner">Prapor směny</string>
+    <string name="acc_pref_bee_shed">Ikona možnosti Rustproof Bee Shed</string>
+    <string name="acc_logo">Logo widgetu události Desert Bus for Hope</string>
+    <string name="author">Autor: Nicholas Killewald</string>
+    <string name="disclaimer">(který není s událostí Desert Bus for Hope spojený nijak oficiálně)</string>
+    <string name="pref_bee_shed_title">Režim Rustproof Bee Shed</string>
+    <string name="pref_bee_shed_on">Bude používat prapory směn Beta Flight a Dusk Guard</string>
+    <string name="pref_bee_shed_off">Bude používat prapory směn Alpha Flight a Night Watch</string>
+    <string name="create_widget">Vytvořit widget</string>
+    <plurals name="hours_bussed_end">
+        <item quantity="one">Autobus byl na cestě %1$d hodinu</item>
+        <item quantity="few">Autobus byl na cestě %1$d hodiny</item>
+        <item quantity="other">Autobus byl na cestě %1$d hodin</item>
+    </plurals>
+    <plurals name="hours_bussed">
+        <item quantity="one">%1$d ZE ZATÍM %2$d HODIN</item>
+        <item quantity="few">%1$d ZE ZATÍM %2$d HODIN</item>
+        <item quantity="other">%1$d ZE ZATÍM %2$d HODIN</item>
+    </plurals>
+    <string name="translator">Do češtiny přeložila Eliška Mannová</string>
+</resources>

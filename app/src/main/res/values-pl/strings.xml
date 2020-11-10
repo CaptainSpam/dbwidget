@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_configure">Widget Configurator</string>
+    <string name="label_fetchservice">DB Widget Data Fetch Service</string>
+    <string name="app_name">Widżet Desert Bus for Hope</string>
+    <string name="to_next_hour">NASTĘPNA GODZINA: %1$s</string>
+    <string name="hours_until_bus">Bus odjeżdża %1$s</string>
+    <string name="error_huh">Oczekiwanie na dane…</string>
+    <string name="error_noconnection">(Wygląda na brak połączenia z siecią?)</string>
+    <string name="error_general">(Nadal oczekiwanie…)</string>
+    <string name="error_nonfresh">(Nie uzyskano nowych danych od %1$s)</string>
+    <string name="acc_banner">Baner zmiany</string>
+    <string name="acc_pref_bee_shed">Ikona preferencji Rustproof Bee Shed</string>
+    <string name="acc_logo">Logo widżeta Desert Bus for Hope</string>
+    <string name="author">Przygotowany przez Nicholas Killewald</string>
+    <string name="disclaimer">(który nie jest związany z Desert Bus for Hope w jakimkolwiek oficjalnym stopniu)</string>
+    <string name="pref_bee_shed_title">Tryb Rustproof Bee Shed</string>
+    <string name="pref_bee_shed_on">Będą użyte banery Beta Flight oraz Dusk Guard</string>
+    <string name="pref_bee_shed_off">Będą użyte banery Alpha Flight oraz Night Watch</string>
+    <string name="create_widget">Dodaj widżet</string>
+    <plurals name="hours_bussed_end">
+        <item quantity="one">Bus jechał %1$d godzinę</item>
+        <item quantity="few">Bus jechał %1$d godziny</item>
+        <item quantity="many">Bus jechał %1$d godzin</item>
+        <item quantity="other">Bus jechał %1$d godzin</item>
+    </plurals>
+    <plurals name="hours_bussed">
+        <item quantity="one">%1$d GODZINA Z JAK DOTĄD %2$d</item>
+        <item quantity="few">%1$d GODZINY Z JAK DOTĄD %2$d</item>
+        <item quantity="many">%1$d GODZIN Z JAK DOTĄD %2$d</item>
+        <item quantity="other">%1$d GODZIN Z JAK DOTĄD %2$d</item>
+    </plurals>
+    <string name="translator">Przetłumaczone na polski przez Łukasza Bylicę</string>
+</resources>
