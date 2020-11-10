@@ -132,6 +132,10 @@ class DBWidgetConfigure : FragmentActivity() {
 
     fun toggleBeeShed(view: View) {
         updateBeeShedIcon()
+
+        if(view is CompoundButton) {
+            beeShed = view.isChecked
+        }
     }
 
     private fun updateBeeShedIcon() {
