@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_configure">Configuración del widget</string>
+    <string name="label_fetchservice">Servicio de obtencion de datos del widget DB</string>
+    <string name="app_name">Widget de Desert Bus for Hope</string>
+    <string name="to_next_hour">HORA SIGUIENTE: %1$s</string>
+    <string name="hours_until_bus">Salida del autobús: %1$s </string>
+    <string name="error_huh">Recopilando datos…</string>
+    <string name="error_noconnection">(Parece que no hay conexión)</string>
+    <string name="error_general">(En espera…)</string>
+    <string name="error_nonfresh">(No ha sido posible obtener nuevos datos desde %1$s)</string>
+    <string name="acc_banner">Bandera del turno</string>
+    <string name="acc_pref_bee_shed">Icono de preferencia de Rustproof Bee Shed</string>
+    <string name="acc_logo">Logo del widget de Desert Bus for Hope</string>
+    <string name="author">Por Nicholas Killewald</string>
+    <string name="disclaimer">(Quien, de hecho, no está relacionado con Desert Bus for Hope de manera oficial)</string>
+    <string name="pref_bee_shed_title">Modo Rustproof Bee Shed</string>
+    <string name="pref_bee_shed_on">Se usarán las banderas de Beta Flight y Dusk Guard</string>
+    <string name="pref_bee_shed_off">Se usarán las banderas de Alpha Flight y Dusk Watch</string>
+    <string name="create_widget">Crear widget</string>
+    <plurals name="hours_bussed_end">
+        <item quantity="one">Se ha conducido el autobús durante %1$d hora</item>
+        <item quantity="other">Se ha conducido el autobús durante %1$d horas</item>
+    </plurals>
+    <plurals name="hours_bussed">
+        <item quantity="one">%1$d HORA DE %2$d HASTA AHORA</item>
+        <item quantity="other">%1$d HORAS DE %2$d HASTA AHORA</item>
+    </plurals>
+    <string name="translator">Traducción al español hecha por Sara Aguirre Gª Carpintero</string>
+</resources>

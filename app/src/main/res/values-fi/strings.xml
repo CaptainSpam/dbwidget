@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_configure">Widget Configurator</string>
+    <string name="label_fetchservice">DB Widget datanhakupalvelu</string>
+    <string name="app_name">Desert Bus for Hope -widget</string>
+    <string name="to_next_hour">SEURAAVA TUNTI: %1$s</string>
+    <string name="hours_until_bus">Bussi lähtee %1$s</string>
+    <string name="error_huh">Odotetaan tietoja…</string>
+    <string name="error_noconnection">(verkkoyhteys näyttää puuttuvan)</string>
+    <string name="error_general">(odotetaan yhä…)</string>
+    <string name="error_nonfresh">(tietojen päivittäminen onnistui viimeksi %1$s)</string>
+    <string name="acc_banner">Vuoron lippu</string>
+    <string name="acc_pref_bee_shed">Rustproof Bee Shed -valinnan kuvake</string>
+    <string name="acc_logo">Desert Bus for Hope -widgetin logo</string>
+    <string name="author">Nicholas Killewaldilta</string>
+    <string name="disclaimer">(joka ei ole virallisesti yhteydessä Desert Bus for Hope -tapahtumaan)</string>
+    <string name="pref_bee_shed_title">Rustproof Bee Shed -tila</string>
+    <string name="pref_bee_shed_on">Käyttää Beta Flight ja Dusk Guard -lippuja</string>
+    <string name="pref_bee_shed_off">Käyttää Alpha Flight ja Night Watch -lippuja</string>
+    <string name="create_widget">Luo widget</string>
+    <plurals name="hours_bussed_end">
+        <item quantity="one">Bussi ajoi %1$d tunnin</item>
+        <item quantity="other">Bussi ajoi %1$d tuntia</item>
+    </plurals>
+    <plurals name="hours_bussed">
+        <item quantity="one">%1$d TUNTI %2$d TUNTIA TÄHÄN MENESSÄ</item>
+        <item quantity="other">%1$d TUNTIA %2$d TUNNISTA TÄHÄN MENESSÄ</item>
+    </plurals>
+    <string name="translator">Suomeksi kääntänyt Eliška Mannová</string>
+</resources>

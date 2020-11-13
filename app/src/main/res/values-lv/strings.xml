@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_configure">Widget Configurator</string>
+    <string name="label_fetchservice">DB Widget Data Fetch Service</string>
+    <string name="app_name">Logrīks Desert Bus for Hope</string>
+    <string name="to_next_hour">NĀKAMĀ STUNDA: %1$s</string>
+    <string name="hours_until_bus">Autobuss atiet %1$s</string>
+    <string name="error_huh">Gaidām datus…</string>
+    <string name="error_noconnection">(izskatās, ka nav tīkla savienojuma?)</string>
+    <string name="error_general">(vēl gaidām…)</string>
+    <string name="error_nonfresh">(nesanāca atjaunot datus no %1$s)</string>
+    <string name="acc_banner">Maiņas baneris</string>
+    <string name="acc_pref_bee_shed">Rustproof Bee Shed iestatījumu ikona</string>
+    <string name="acc_logo">Desert Bus for Hope Logrīka Logotips</string>
+    <string name="author">autors Nicholas Killewald</string>
+    <string name="disclaimer">(kas patiesībā nav saistīts ar Desert Bus for Hope oficiālā kapacitātē)</string>
+    <string name="pref_bee_shed_title">Rustproof Bee Shed Režīms</string>
+    <string name="pref_bee_shed_on">Izmantot Beta Flight un Dusk Guard banerus</string>
+    <string name="pref_bee_shed_off">Izmantot Alpha Flight un Night Watch banerus</string>
+    <string name="create_widget">Izveidot Logrīku</string>
+    <plurals name="hours_bussed_end">
+        <item quantity="zero">Autobuss brauca %1$d stundu</item>
+        <item quantity="one">Autobuss brauca %1$d stundu</item>
+        <item quantity="other">Autobuss brauca %1$d stundas</item>
+    </plurals>
+    <plurals name="hours_bussed">
+        <item quantity="zero">TIK TĀLU %1$d STUNDU NO %2$d</item>
+        <item quantity="one">TIK TĀLU %1$d STUNDA NO %2$d</item>
+        <item quantity="other">TIK TĀLU %1$d STUNDAS NO %2$d</item>
+    </plurals>
+    <string name="translator">Pārtulkoja Aleksandrs "Saņa" Oļeiņikovs</string>
+</resources>

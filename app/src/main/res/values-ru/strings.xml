@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_configure">Widget Configurator</string>
+    <string name="label_fetchservice">DB Widget Data Fetch Service</string>
+    <string name="app_name">Виджет Desert Bus for Hope</string>
+    <string name="to_next_hour">СЛЕДУЮЩИЙ ЧАС: %1$s</string>
+    <string name="hours_until_bus">Автобус отправляется %1$s</string>
+    <string name="error_huh">Ожидаются данные…</string>
+    <string name="error_noconnection">(похоже нет соединения?)</string>
+    <string name="error_general">(ещё ожидается…)</string>
+    <string name="error_nonfresh">(не получилось обновить данные с %1$s)</string>
+    <string name="acc_banner">Баннер смены</string>
+    <string name="acc_pref_bee_shed">Иконка установки Rustproof Bee Shed</string>
+    <string name="acc_logo">Лого Виджета Desert Bus for Hope</string>
+    <string name="author">автор Nicholas Killewald</string>
+    <string name="disclaimer">(на самом деле официально не связан с Desert Bus for Hope)</string>
+    <string name="pref_bee_shed_title">Режим Rustproof Bee Shed</string>
+    <string name="pref_bee_shed_on">Использовать баннеры Beta Flight и Dusk Guard</string>
+    <string name="pref_bee_shed_off">Использовать баннеры Alpha Flight и Night Watch</string>
+    <string name="create_widget">Создать Виджет</string>
+    <plurals name="hours_bussed_end">
+        <item quantity="one">Автобус ехал %1$d час</item>
+        <item quantity="few">Автобус ехал %1$d часа</item>
+        <item quantity="many">Автобус ехал %1$d часов</item>
+        <item quantity="other">Автобус ехал %1$d часов</item>
+    </plurals>
+    <plurals name="hours_bussed">
+        <item quantity="one">ПОКА %1$d ЧАС ИЗ %2$d</item>
+        <item quantity="few">ПОКА %1$d ЧАСА ИЗ %2$d</item>
+        <item quantity="many">ПОКА %1$d ЧАСОВ ИЗ %2$d</item>
+        <item quantity="other">ПОКА %1$d ЧАСОВ ИЗ %2$d</item>
+    </plurals>
+    <string name="translator">Перевёл Алесандр "Сань" Олейников</string>
+</resources>
