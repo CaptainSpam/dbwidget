@@ -121,7 +121,7 @@ class WidgetProvider : AppWidgetProvider() {
                     AlarmManager.RTC,
                     cal.timeInMillis,
                     PendingIntent.getBroadcast(
-                        context,
+                        context.applicationContext,
                         0,
                         Intent(context, WidgetProvider::class.java).setAction(CHECK_ALARM_ACTION),
                         0
@@ -151,7 +151,7 @@ class WidgetProvider : AppWidgetProvider() {
                     AlarmManager.RTC,
                     cal.timeInMillis,
                     PendingIntent.getBroadcast(
-                        context,
+                        context.applicationContext,
                         0,
                         Intent(context, WidgetProvider::class.java).setAction(CHECK_ALARM_ACTION),
                         0
@@ -170,7 +170,7 @@ class WidgetProvider : AppWidgetProvider() {
 
             alarmManager.cancel(
                 PendingIntent.getBroadcast(
-                    context,
+                    context.applicationContext,
                     0,
                     Intent(context, WidgetProvider::class.java).setAction(CHECK_ALARM_ACTION),
                     0
@@ -277,7 +277,7 @@ class WidgetProvider : AppWidgetProvider() {
             // If the user clicks anywhere on the widget, go to the DB website.  Even if that
             // reveals that its data may disagree with ours.
             val pendingIntent = PendingIntent.getActivity(
-                context,
+                context.applicationContext,
                 0,
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://www.desertbus.org")),
                 0
