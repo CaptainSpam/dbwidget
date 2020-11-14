@@ -4,12 +4,10 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
-import android.content.BroadcastReceiver
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.SystemClock
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.View
@@ -69,22 +67,6 @@ class WidgetProvider : AppWidgetProvider() {
             }
         }"
 
-        /** This does whatever needs doing for the alarm. */
-        class AlarmReceiver : BroadcastReceiver() {
-            override fun onReceive(context: Context, intent: Intent) {
-                Log.d(DEBUG_TAG, "ALARM!!!!  Enqueueing work!")
-                // Tell the service to try a fetch.  That will fire off updates on the LiveData
-                // object for the widget to find later.  It'll be hilarious, trust me.
-                DataFetchService.enqueueWork(
-                    context,
-                    Intent(DataFetchService.ACTION_FETCH_DATA)
-                )
-
-                // Then, reschedule for later down the line.
-                scheduleAlarm(context)
-            }
-        }
-
         /**
          * Determines if a faster update schedule (every minute, as opposed to every six hours) is
          * needed.  The basic logic is:
@@ -124,30 +106,31 @@ class WidgetProvider : AppWidgetProvider() {
             val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
 
             if(needsFastUpdate()) {
+                val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC"))
+                cal.add(Calendar.MILLISECOND, ALARM_TIMEOUT_MILLIS.toInt())
+
                 Log.d(
                     DEBUG_TAG,
-                    "Setting alarm for ${SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS}..."
+                    "Setting alarm for ${cal.timeInMillis}..."
                 )
 
                 // We'll use plain alarms and reschedule as needed.  We'll do this primarily because
                 // we DON'T want this to use a wakeup alarm, and we DO want it to be able to drift
                 // as need be.  Excessive checks would be pointless.
                 alarmManager.set(
-                    AlarmManager.ELAPSED_REALTIME,
-                    SystemClock.elapsedRealtime() + ALARM_TIMEOUT_MILLIS,
+                    AlarmManager.RTC,
+                    cal.timeInMillis,
                     PendingIntent.getBroadcast(
                         context,
                         0,
-                        Intent(context, AlarmReceiver::class.java).setAction(CHECK_ALARM_ACTION),
+                        Intent(context, WidgetProvider::class.java).setAction(CHECK_ALARM_ACTION),
                         0
                     )
                 )
             } else {
                 // If we don't need per-minute updates, just schedule an alarm for the next time the
-                // banner needs to update.  The resolution we're dealing with in this check is the
-                // span of a month, so a difference of a few time zones is trivial.  We can
-                // therefore always use Pacific Time here, which will come in handy when
-                // rescheduling the alarm for banner updates.
+                // banner needs to update.  This one should be Pacific time (potentially with DST)
+                // to match the Moonbase.
                 val cal = Calendar.getInstance(TimeZone.getTimeZone("America/Los_Angeles"))
 
                 when(cal.get(Calendar.HOUR_OF_DAY)) {
@@ -170,7 +153,7 @@ class WidgetProvider : AppWidgetProvider() {
                     PendingIntent.getBroadcast(
                         context,
                         0,
-                        Intent(context, AlarmReceiver::class.java).setAction(CHECK_ALARM_ACTION),
+                        Intent(context, WidgetProvider::class.java).setAction(CHECK_ALARM_ACTION),
                         0
                     )
                 )
@@ -189,7 +172,7 @@ class WidgetProvider : AppWidgetProvider() {
                 PendingIntent.getBroadcast(
                     context,
                     0,
-                    Intent(context, AlarmReceiver::class.java).setAction(CHECK_ALARM_ACTION),
+                    Intent(context, WidgetProvider::class.java).setAction(CHECK_ALARM_ACTION),
                     0
                 )
             )
@@ -437,8 +420,20 @@ class WidgetProvider : AppWidgetProvider() {
 
         // If this is the data fetched action, the superclass didn't handle it.  That's where we
         // step in...
-        if(intent.action === DataFetchService.ACTION_DATA_FETCHED) {
-            renderWidgets(context)
+        when(intent.action) {
+            DataFetchService.ACTION_DATA_FETCHED -> renderWidgets(context)
+            CHECK_ALARM_ACTION -> {
+                Log.d(DEBUG_TAG, "ALARM!!!!  Enqueueing work!")
+                // Tell the service to try a fetch.  That will fire off updates on the LiveData
+                // object for the widget to find later.  It'll be hilarious, trust me.
+                DataFetchService.enqueueWork(
+                    context,
+                    Intent(DataFetchService.ACTION_FETCH_DATA)
+                )
+
+                // Then, reschedule for later down the line.
+                scheduleAlarm(context)
+            }
         }
     }
 
