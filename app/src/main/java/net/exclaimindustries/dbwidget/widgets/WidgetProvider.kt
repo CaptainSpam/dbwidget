@@ -28,7 +28,7 @@ class WidgetProvider : AppWidgetProvider() {
         private const val DEBUG_TAG = "WidgetProvider"
 
         /** The alarm timeout, in millis.  After this much time, a new fetch will be attempted. */
-        private const val ALARM_TIMEOUT_MILLIS = 60000L
+        private const val ALARM_TIMEOUT_MILLIS = 120000L
 
         /**
          * After this amount of time with errors, a line of text will show up saying how long it's
@@ -68,8 +68,8 @@ class WidgetProvider : AppWidgetProvider() {
         }"
 
         /**
-         * Determines if a faster update schedule (every minute, as opposed to every six hours) is
-         * needed.  The basic logic is:
+         * Determines if a faster update schedule (ALARM_TIMEOUT_MILLIS, as opposed to waiting for
+         * the next shift change) is needed.  The basic logic is:
          *
          * * If there is no valid event yet, a fast update *IS* needed.
          * * If there is a valid event but it contains no valid data, a fast update *IS* needed.
