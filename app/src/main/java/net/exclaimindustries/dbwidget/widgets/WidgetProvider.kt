@@ -287,17 +287,17 @@ class WidgetProvider : AppWidgetProvider() {
             )
             views.setOnClickPendingIntent(R.id.widget, pendingIntent)
 
-            // Or, if the user clicks on the refresh button, force a refresh.
+            // Or, if the user clicks on the refresh button (or spinner), force a refresh.
             val refreshIntent = PendingIntent.getBroadcast(
                 context.applicationContext,
                 0,
                 Intent(context, WidgetProvider::class.java).setAction(FORCE_REFRESH),
                 0
             )
+            views.setOnClickPendingIntent(R.id.spinner, refreshIntent)
             views.setOnClickPendingIntent(R.id.refresh, refreshIntent)
 
-            // Set the refresh button a-spinnin', if need be.  If need not be, stop it from
-            // a-spinnin'.
+            // Set the spinner a-spinnin', if need be.  If need not be, stop it from a-spinnin'.
             if(event is DataFetchService.Companion.ResultEvent.Fetching) {
                 Log.d(DEBUG_TAG, "Fetch in progress, spinning the spinny thing...")
                 views.setViewVisibility(R.id.refresh, View.GONE)
