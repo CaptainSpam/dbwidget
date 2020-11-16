@@ -20,4 +20,7 @@
     <dimen name="refresh_button_margin">4dp</dimen>
 
     <dimen name="pref_icon_margin">16dp</dimen>
+
+    <!-- Also the size of the spinner when fetching. -->
+    <dimen name="refresh_size">16dp</dimen>
 </resources>

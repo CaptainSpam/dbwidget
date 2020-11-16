@@ -58,6 +58,12 @@ class DataFetchService : JobIntentService() {
         /** Action name for fetching data. */
         const val ACTION_FETCH_DATA = "net.exclaimindustries.dbwidget.FETCH_DATA"
 
+        /**
+         * Broadcast name for actively fetching data.  This is useful for telling the main widget to
+         * start spinning the refresh button as an indicator that a fetch is underway.
+         */
+        const val ACTION_FETCHING = "net.exclaimindustries.dbwidget.FETCHING"
+
         /** Broadcast name for fetched data. */
         const val ACTION_DATA_FETCHED = "net.exclaimindustries.dbwidget.DATA_FETCHED"
 
@@ -155,6 +161,8 @@ class DataFetchService : JobIntentService() {
                 override val data: ResultData?,
                 val exception: Exception?
             ) : ResultEvent()
+            /** A fetch is in progress; last-known results are included. */
+            data class Fetching(override val data: ResultData?) : ResultEvent()
         }
 
         /** A LiveData observable thingamajig for results. */
@@ -176,6 +184,8 @@ class DataFetchService : JobIntentService() {
             dispatchCachedData(lastKnownData)
             return
         }
+
+        broadcastStartFetch()
 
         val currentDonations: Double
         val runStartTime: Long
@@ -322,5 +332,10 @@ class DataFetchService : JobIntentService() {
         // This lets the WidgetProvider know the LiveData's been updated, which in turn means it'll
         // be listening in such a way that gives it a Context where LiveData's Observer doesn't.
         sendBroadcast(Intent(ACTION_DATA_FETCHED).setClass(this, WidgetProvider::class.java))
+    }
+
+    private fun broadcastStartFetch() {
+        ResultEventLiveData.notify(ResultEvent.Fetching(ResultEventLiveData.value?.data))
+        sendBroadcast(Intent(ACTION_FETCHING).setClass(this, WidgetProvider::class.java))
     }
 }

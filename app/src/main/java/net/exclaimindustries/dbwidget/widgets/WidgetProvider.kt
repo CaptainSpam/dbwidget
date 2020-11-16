@@ -296,6 +296,18 @@ class WidgetProvider : AppWidgetProvider() {
             )
             views.setOnClickPendingIntent(R.id.refresh, refreshIntent)
 
+            // Set the refresh button a-spinnin', if need be.  If need not be, stop it from
+            // a-spinnin'.
+            if(event is DataFetchService.Companion.ResultEvent.Fetching) {
+                Log.d(DEBUG_TAG, "Fetch in progress, spinning the spinny thing...")
+                views.setViewVisibility(R.id.refresh, View.GONE)
+                views.setViewVisibility(R.id.spinner, View.VISIBLE)
+            } else {
+                Log.d(DEBUG_TAG, "Not actively fetching, stopping the spinny bits...")
+                views.setViewVisibility(R.id.refresh, View.VISIBLE)
+                views.setViewVisibility(R.id.spinner, View.GONE)
+            }
+
             // Extract the event data, if there is any.
             val data = event?.data
 
@@ -433,7 +445,9 @@ class WidgetProvider : AppWidgetProvider() {
         // If this is the data fetched action, the superclass didn't handle it.  That's where we
         // step in...
         when(intent.action) {
-            DataFetchService.ACTION_DATA_FETCHED -> renderWidgets(context)
+            DataFetchService.ACTION_DATA_FETCHED, DataFetchService.ACTION_FETCHING -> renderWidgets(
+                context
+            )
             CHECK_ALARM_ACTION, FORCE_REFRESH -> {
                 Log.d(
                     DEBUG_TAG, when (intent.action) {

@@ -120,4 +120,17 @@
         android:focusable="true"
         android:src="@drawable/refresh" />
 
+    <ProgressBar
+        android:id="@+id/spinner"
+        style="?android:attr/progressBarStyle"
+        android:layout_width="@dimen/refresh_size"
+        android:layout_height="@dimen/refresh_size"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="@dimen/refresh_button_margin"
+        android:layout_marginBottom="@dimen/refresh_button_margin"
+        android:indeterminate="true"
+        android:indeterminateTint="@android:color/white"
+        android:visibility="gone" />
+
 </RelativeLayout>

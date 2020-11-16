@@ -21,6 +21,7 @@
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="net.exclaimindustries.dbwidget.DATA_FETCHED" />
+                <action android:name="net.exclaimindustries.dbwidget.FETCHING" />
                 <action android:name="net.exclaimindustries.dbwidget.CHECK_ALARM" />
             </intent-filter>
 
