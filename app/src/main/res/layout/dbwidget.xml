@@ -107,4 +107,17 @@
             tools:text="(haven't had fresh data in a while)"/>
     </LinearLayout>
 
+    <ImageButton
+        android:id="@+id/refresh"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="@dimen/refresh_button_margin"
+        android:layout_marginBottom="@dimen/refresh_button_margin"
+        android:background="@null"
+        android:clickable="true"
+        android:focusable="true"
+        android:src="@drawable/refresh" />
+
 </RelativeLayout>

@@ -51,6 +51,9 @@ class WidgetProvider : AppWidgetProvider() {
         /** Action name for the alarm. */
         private const val CHECK_ALARM_ACTION = "net.exclaimindustries.dbwidget.CHECK_ALARM"
 
+        /** Action name for forcing a refresh. */
+        private const val FORCE_REFRESH = "net.exclaimindustries.dbwidget.FORCE_REFRESH"
+
         /** Pref key fragment for using Rustproof Bee Shed banners. */
         private const val PREF_BEESHED = "RustproofBeeShed"
 
@@ -284,6 +287,15 @@ class WidgetProvider : AppWidgetProvider() {
             )
             views.setOnClickPendingIntent(R.id.widget, pendingIntent)
 
+            // Or, if the user clicks on the refresh button, force a refresh.
+            val refreshIntent = PendingIntent.getBroadcast(
+                context.applicationContext,
+                0,
+                Intent(context, WidgetProvider::class.java).setAction(FORCE_REFRESH),
+                0
+            )
+            views.setOnClickPendingIntent(R.id.refresh, refreshIntent)
+
             // Extract the event data, if there is any.
             val data = event?.data
 
@@ -422,8 +434,14 @@ class WidgetProvider : AppWidgetProvider() {
         // step in...
         when(intent.action) {
             DataFetchService.ACTION_DATA_FETCHED -> renderWidgets(context)
-            CHECK_ALARM_ACTION -> {
-                Log.d(DEBUG_TAG, "ALARM!!!!  Enqueueing work!")
+            CHECK_ALARM_ACTION, FORCE_REFRESH -> {
+                Log.d(
+                    DEBUG_TAG, when (intent.action) {
+                        CHECK_ALARM_ACTION -> "ALARM!!!!  Enqueueing work!"
+                        FORCE_REFRESH -> "FORCED REFRESH!!!!  Enqueueing work!"
+                        else -> "I GUESS WE'RE JUST GOING NOW?"
+                    }
+                )
                 // Tell the service to try a fetch.  That will fire off updates on the LiveData
                 // object for the widget to find later.  It'll be hilarious, trust me.
                 DataFetchService.enqueueWork(
