@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="label_configure">Valdiklio nustatymai</string>
+    <string name="label_fetchservice">DB valdiklio duomenų gavimo paslauga</string>
+    <string name="app_name">Desert Bus for Hope Valdiklis</string>
+    <string name="to_next_hour">SEKANTI VALANDA: %1$s</string>
+    <string name="hours_until_bus">Autobusas išvyksta %1$s</string>
+    <string name="error_huh">Laukiama duomenų…</string>
+    <string name="error_noconnection">(Panašu, kad nesate prisijungę prie tinklo)</string>
+    <string name="error_general">(vis dar laukiama…)</string>
+    <string name="error_nonfresh">(duomenų atnaujinti nepavyko jau %1$s)</string>
+    <string name="acc_banner">Pamainos vėliavėlė</string>
+    <string name="acc_pref_bee_shed">Rustproof Bee Shed režimo piktograma</string>
+    <string name="acc_logo">Desert Bus for Hope valdiklio piktograma</string>
+    <string name="author">Valdiklio autorius Nicholas Killewald</string>
+    <string name="disclaimer">(jis nėra oficialiai susijęs su Desert Bus for Hope)</string>
+    <string name="pref_bee_shed_title">Rustproof Bee Shed režimas</string>
+    <string name="pref_bee_shed_on">Bus naudojamos Beta Flight ir Dusk Guard režimų vėliavėlės</string>
+    <string name="pref_bee_shed_off">Bus naudojamos Alpha Flight ir Night Watch režimų vėliavėlės</string>
+    <string name="create_widget">Sukurti valdiklį</string>
+    <plurals name="hours_bussed_end">
+        <item quantity="one">Autobusas važiavo %1$d valandą</item>
+        <item quantity="other">Autobusas važiavo %1$d valandų</item>
+        <item quantity="few">Autobusas važiavo %1$d valandos</item>
+    </plurals>
+    <plurals name="hours_bussed">
+        <item quantity="one">ŠIUO METU %1$d VALANDA IŠ %2$d</item>
+        <item quantity="other">ŠIUO METU %1$d VALANDŲ IŠ %2$d</item>
+        <item quantity="few">ŠIUO METU %1$d VALANDOS IŠ %2$d</item>
+    </plurals>
+    <string name="translator">Į lietuvių kalbą išvertė Onutė</string>
+</resources>
