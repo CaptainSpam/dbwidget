@@ -1,16 +1,15 @@
 <resources>
-    <!-- Label for the configuration activity.  Likely will not be displayed in the interface and
-         therefore does not require translation. -->
+    <!-- Label for the configuration activity.  Likely will not be displayed in the interface. -->
     <string name="label_configure">Widget Configurator</string>
     <!-- Label for the fetch service.  This will show up mostly in debugging and in anything that
          lists all the services running on the device.  Likely does not require translation. -->
     <string name="label_fetchservice">DB Widget Data Fetch Service</string>
 
-    <!-- Name of the app.  Will appear in the system's app list (but, since there's no launcher
-         activity, it likely won't appear in the launcher list) and the configuration screen.  When
-         translating, remember that while, for instance, Desert Bus De L'Espoir *exists*, that's a
-         whole other event, and this widget refers specifically to the thing LoadingReadyRun puts on
-         every year.-->
+    <!-- Name of the app.  Will appear in the widget list as the name of the widget, as well as the
+         top of the configuration screen.  When translating, remember that while, for instance,
+         Desert Bus De L'Espoir *exists*, that's a whole other event, and this widget refers
+         specifically to the thing LoadingReadyRun puts on every year.  Therefore, the exact phrase
+         "Desert Bus for Hope" should be treated as a proper name. -->
     <string name="app_name">Desert Bus for Hope Widget</string>
 
     <!-- How much money is needed to reach the next hour of driving.  Will be the third line
@@ -35,8 +34,8 @@
     <string name="error_noconnection">(looks like there\'s no network connection?)</string>
     <!-- String displayed in smaller text underneath error_huh if there is no useful data, and an
          attempt to fetch data resulted in a general error not covered by any other error.  Should
-         most likely be phrased as if the widget is still waiting for data and hasn't given up yet.
-         Remember, the error_huh string WILL remain visible above this. -->
+         be phrased as if the widget is still waiting for data and hasn't given up yet.  Remember,
+         the error_huh string WILL remain visible above this. -->
     <string name="error_general">(still waiting…)</string>
     <!-- String displayed in smaller text underneath to_next_hour while Desert Bus is in progress,
          there was valid data before (which is presently being displayed), but that data has become
@@ -58,17 +57,19 @@
     <!-- Disclaimer about how I am not actually officially related to Desert Bus for Hope. -->
     <string name="disclaimer">(who is not actually related to Desert Bus for Hope in any official capacity)</string>
 
-    <!-- Title of the configure setting for Rustproof Bee Shed banners.  This likely does not need
-         translating, as it is a proper name. -->
+    <!-- Title of the configure setting for Rustproof Bee Shed banners.  The exact phrase "Rustproof
+         Bee Shed" should be treated as a proper name for reasons too weird to get into here. -->
     <string name="pref_bee_shed_title">Rustproof Bee Shed Mode</string>
     <!-- Text displayed in the configure screen if the Rustproof Bee Shed setting is toggled on.
-         Describes that the widget will use Beta Flight and Dusk Guard's banners. -->
+         Describes that the widget will use Beta Flight and Dusk Guard's banners.  "Beta Flight" and
+         "Dusk Guard" are proper names. -->
     <string name="pref_bee_shed_on">Will use Beta Flight and Dusk Guard banners</string>
     <!-- Text displayed in the configure screen if the Rustproof Bee Shed setting is toggled off.
-         Describes that the widget will use Alpha Flight and Night Watch's banners. -->
+         Describes that the widget will use Alpha Flight and Night Watch's banners.  "Alpha Flight"
+         and "Night Watch" are proper names. -->
     <string name="pref_bee_shed_off">Will use Alpha Flight and Night Watch banners</string>
 
-    <!-- Label on button in the configure screen that will create the widget with the given
+    <!-- Label on the button in the configure screen that will create the widget with the given
          settings. -->
     <string name="create_widget">Create Widget</string>
 
