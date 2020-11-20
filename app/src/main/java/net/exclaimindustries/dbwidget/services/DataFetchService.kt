@@ -241,7 +241,7 @@ class DataFetchService : JobIntentService() {
             val httpGet = HttpGet(OMEGA_CHECK_URL)
             val handler = BasicResponseHandler()
             Log.d(DEBUG_TAG, "Fetching Omega Shift...")
-            httpClient.execute(httpGet, handler).trim() === "1"
+            httpClient.execute(httpGet, handler).trim() == "1"
         } catch(e: Exception) {
             // If, however, that threw an exception, just consider it to be false.  This check is
             // less vital and can be kicked down the road a bit.
