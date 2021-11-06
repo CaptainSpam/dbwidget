@@ -82,6 +82,10 @@ class WidgetProvider : AppWidgetProvider() {
          *   needed.
          * * Otherwise (meaning there's valid data, the latest run is over, and we don't know when
          *   the next one begins), a fast update *is NOT* needed.
+         *
+         * That is to say, a fast update is needed if there is an active run, meaning we want more
+         * frequent updates as donations come in.  If the run isn't active, and thus the donation
+         * count generally isn't going up, we only need to update the display for shift banners.
          */
         private fun needsFastUpdate(): Boolean {
             val data = DataFetchService.Companion.ResultEventLiveData.value?.data
@@ -277,8 +281,8 @@ class WidgetProvider : AppWidgetProvider() {
                 ResourcesCompat.getColor(context.resources, getShiftBackgroundColor(shift), null)
             )
 
-            // If the user clicks anywhere on the widget, go to the DB website.  Even if that
-            // reveals that its data may disagree with ours.
+            // If the user clicks anywhere on the widget, go to the DB website, even if that reveals
+            // that its data may disagree with ours.
             val pendingIntent = PendingIntent.getActivity(
                 context.applicationContext,
                 0,
