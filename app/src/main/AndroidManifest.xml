@@ -17,7 +17,9 @@
         android:theme="@style/AppTheme"
         tools:ignore="AllowBackup">
 
-        <receiver android:name=".widgets.WidgetProvider">
+        <receiver
+            android:name=".widgets.WidgetProvider"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
                 <action android:name="net.exclaimindustries.dbwidget.DATA_FETCHED" />
@@ -33,7 +35,8 @@
 
         <activity
             android:name=".activities.DBWidgetConfigure"
-            android:label="@string/label_configure">
+            android:label="@string/label_configure"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.appwidget.action.APPWIDGET_CONFIGURE"/>
             </intent-filter>
