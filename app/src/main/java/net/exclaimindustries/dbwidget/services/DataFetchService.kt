@@ -5,6 +5,7 @@ import android.content.Intent
 import android.util.Log
 import androidx.core.app.JobIntentService
 import androidx.lifecycle.LiveData
+import cz.msebera.android.httpclient.client.HttpClient
 import cz.msebera.android.httpclient.client.HttpResponseException
 import cz.msebera.android.httpclient.client.methods.HttpGet
 import cz.msebera.android.httpclient.impl.client.BasicResponseHandler
@@ -30,9 +31,6 @@ class DataFetchService : JobIntentService() {
          * "https://vst.ninja/".  This is here to make changing things for testing easier.
          */
         private const val URL_PREFIX = "https://vst.ninja/"
-
-        /** URL to get the current donation total. */
-        private const val CURRENT_TOTAL_URL = "${URL_PREFIX}milestones/latestTotal"
 
         /** URL to get the stats.  Replace "<YEAR>" with the actual numbered DB. */
         private const val STATS_URL_BASE = "${URL_PREFIX}DB<YEAR>/data/DB<YEAR>_stats.json"
@@ -171,6 +169,12 @@ class DataFetchService : JobIntentService() {
                 postValue(result)
             }
         }
+
+        /** Ephemeral class used during data fetching. */
+        private data class FetchedStats(
+            val currentDonations: Double,
+            val runStartTimeMillis: Long,
+        )
     }
 
     override fun onHandleWork(intent: Intent) {
@@ -187,12 +191,10 @@ class DataFetchService : JobIntentService() {
 
         broadcastStartFetch()
 
-        val currentDonations: Double
-        val runStartTime: Long
         val omegaShift: Boolean
+        val stats: FetchedStats
         try {
-            currentDonations = fetchCurrentDonations()
-            runStartTime = fetchRunStartTime()
+            stats = fetchStats()
             omegaShift = fetchOmegaShift()
         } catch (e: Exception) {
             Log.e(DEBUG_TAG, "Exception when fetching data:", e)
@@ -210,22 +212,12 @@ class DataFetchService : JobIntentService() {
 
         // Massage the data and send it out the door!
         dispatchData(
-            currentDonations,
-            runStartTime,
-            DonationConverter.totalHoursForDonationAmount(currentDonations),
-            DonationConverter.toNextHourFromDonationAmount(currentDonations),
+            stats.currentDonations,
+            stats.runStartTimeMillis,
+            DonationConverter.totalHoursForDonationAmount(stats.currentDonations),
+            DonationConverter.toNextHourFromDonationAmount(stats.currentDonations),
             omegaShift
         )
-    }
-
-    private fun fetchCurrentDonations(): Double {
-        // If something throws here, we'll just let onHandleWork handle it.
-        val httpClient = HttpClientBuilder.create().build()
-        val httpGet = HttpGet(CURRENT_TOTAL_URL)
-        val handler = BasicResponseHandler()
-
-        Log.d(DEBUG_TAG, "Fetching current donations...")
-        return httpClient.execute(httpGet, handler).toDouble()
     }
 
     private fun fetchOmegaShift(): Boolean {
@@ -250,7 +242,7 @@ class DataFetchService : JobIntentService() {
         }
     }
 
-    private fun fetchRunStartTime(): Long {
+    private fun fetchStats(): FetchedStats {
         // Step one, try to fetch THIS year's run data.
         val year = Calendar.getInstance().get(Calendar.YEAR)
 
@@ -262,23 +254,34 @@ class DataFetchService : JobIntentService() {
         try {
             httpGet = HttpGet(getStatsUrl(year))
             Log.d(DEBUG_TAG, "Attempting stats fetch on ${httpGet.uri}...")
-            return JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
-                .getLong("Year Start Actual UNIX Time") * 1000
+            return extractStatsFromResponse(httpClient, httpGet, handler)
         } catch (e: Exception) {
             // If that threw a 404, try backing off a year.
             if (e is HttpResponseException && e.statusCode == 404) {
-                // If it throws THIS time, don't catch it; we've got a legit problem now and the
-                // caller should bail out to an error response.
                 httpGet = HttpGet(getStatsUrl(year - 1))
                 Log.d(DEBUG_TAG, "404'd; backing off a year and trying stats fetch on ${httpGet.uri}...")
-                return JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
-                    .getLong("Year Start Actual UNIX Time") * 1000
+                // If it throws THIS time, don't catch it; we've got a legit problem now and the
+                // caller should bail out to an error response.
+                return extractStatsFromResponse(httpClient, httpGet, handler)
             } else {
                 // If it's NOT a 404 (or is some other exception), just throw it back.
                 Log.e(DEBUG_TAG, "Fetching stats was a failure:", e)
                 throw e
             }
         }
+    }
+
+    private fun extractStatsFromResponse(
+        httpClient: HttpClient,
+        httpGet:HttpGet,
+        handler:BasicResponseHandler
+    ): FetchedStats {
+        // If anything goes wrong here, just let the exception be thrown.
+        val response = JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
+        return FetchedStats(
+                response.getString("Total Raised").toDouble(),
+        response.getLong("Year Start Actual UNIX Time") * 1000
+        )
     }
 
     private fun dispatchData(
