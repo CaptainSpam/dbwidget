@@ -57,16 +57,22 @@ class WidgetProvider : AppWidgetProvider() {
         /** Pref key fragment for using Rustproof Bee Shed banners. */
         private const val PREF_BEESHED = "RustproofBeeShed"
 
+        /** Pref key fragment for using the vintage Omega Shift banner. */
+        private const val PREF_VINTAGEOMEGASHIFT = "VintageOmegaShift"
+
         /** The known prefs. */
         enum class Prefs {
             /** Corresponds to PREF_BEESHED. */
             BEESHED,
+            /** Corresponds to PREF_VINTAGEOMEGASHIFT. */
+            VINTAGEOMEGASHIFT,
         }
 
         /** Get the key for the given pref of the given widget ID. */
         fun prefKeyFor(id: Int, pref: Prefs): String = "widget${id}${
             when (pref) {
                 Prefs.BEESHED -> PREF_BEESHED
+                Prefs.VINTAGEOMEGASHIFT -> PREF_VINTAGEOMEGASHIFT
             }
         }"
 
@@ -213,30 +219,32 @@ class WidgetProvider : AppWidgetProvider() {
 
         /** Gets the banner Drawable associated with the given shift. */
         @DrawableRes
-        private fun getShiftDrawable(shift: DBShift): Int = when (shift) {
+        private fun getShiftDrawable(shift: DBShift, vintageOmega: Boolean = false): Int = when (shift) {
             DBShift.DAWNGUARD -> R.drawable.dbdawnguard
             DBShift.ALPHAFLIGHT -> R.drawable.dbalphaflight
             DBShift.BETAFLIGHT -> R.drawable.dbbetaflight
             DBShift.NIGHTWATCH -> R.drawable.dbnightwatch
             DBShift.DUSKGUARD -> R.drawable.dbduskguard
             DBShift.ZETASHIFT -> R.drawable.dbzetashift
-            // TODO: Re-add once I've got translations for an option (probably for DB2022?).
-//            DBShift.OMEGASHIFT -> R.drawable.dbomegashift
-            DBShift.OMEGASHIFT -> R.drawable.dbomegashift2021
+            DBShift.OMEGASHIFT -> when(vintageOmega) {
+                true -> R.drawable.dbomegashift
+                false -> R.drawable.dbomegashift2021
+            }
         }
 
         /** Gets the background color associated with the given shift. */
         @ColorRes
-        private fun getShiftBackgroundColor(shift: DBShift): Int = when (shift) {
+        private fun getShiftBackgroundColor(shift: DBShift, vintageOmega: Boolean = false): Int = when (shift) {
             DBShift.DAWNGUARD -> R.color.background_dawnguard
             DBShift.ALPHAFLIGHT -> R.color.background_alphaflight
             DBShift.BETAFLIGHT -> R.color.background_betaflight
             DBShift.NIGHTWATCH -> R.color.background_nightwatch
             DBShift.DUSKGUARD -> R.color.background_duskguard
             DBShift.ZETASHIFT -> R.color.background_zetashift
-            // TODO: Re-add once I've got translations for an option (probably for DB2022?).
-//            DBShift.OMEGASHIFT -> R.color.background_omegashift
-            DBShift.OMEGASHIFT -> R.color.background_omegashift2021
+            DBShift.OMEGASHIFT -> when(vintageOmega) {
+                true -> R.color.background_omegashift
+                false -> R.color.background_omegashift2021
+            }
         }
 
         /**
@@ -278,11 +286,15 @@ class WidgetProvider : AppWidgetProvider() {
             event: DataFetchService.Companion.ResultEvent?
         ) {
             val views = RemoteViews(context.packageName, R.layout.dbwidget)
-            views.setImageViewResource(R.id.banner, getShiftDrawable(shift))
+            val prefs = PreferenceManager.getDefaultSharedPreferences(context)
+            val vintageOmega = prefs.getBoolean(prefKeyFor(id, Prefs.VINTAGEOMEGASHIFT), false)
+            views.setImageViewResource(R.id.banner, getShiftDrawable(shift, vintageOmega))
             views.setInt(
                 R.id.banner,
                 "setBackgroundColor",
-                ResourcesCompat.getColor(context.resources, getShiftBackgroundColor(shift), null)
+                ResourcesCompat.getColor(context.resources,
+                    getShiftBackgroundColor(shift, vintageOmega),
+                    null)
             )
 
             // If the user clicks anywhere on the widget, go to the DB website, even if that reveals
@@ -497,6 +509,7 @@ class WidgetProvider : AppWidgetProvider() {
         appWidgetIds.forEach{ id -> run {
                 prefs.edit {
                     this.remove(prefKeyFor(id, Prefs.BEESHED))
+                    this.remove(prefKeyFor(id, Prefs.VINTAGEOMEGASHIFT))
                 }
             }
         }

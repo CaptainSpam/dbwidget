@@ -62,6 +62,21 @@
         app:layout_constraintWidth_percent="0.5" />
 
     <CheckBox
+        android:id="@+id/vintage_omega_switch"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="@dimen/general_config_margin"
+        android:drawableEnd="@drawable/pref_vintage_omega_off"
+        android:onClick="toggleVintageOmega"
+        android:text="@string/pref_vintage_omega_title"
+        android:textAppearance="@style/ConfigSetting"
+        app:layout_constraintBottom_toTopOf="@id/bee_shed_switch"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_chainStyle="packed"
+        app:layout_constraintWidth_default="percent"
+        app:layout_constraintWidth_percent="0.5" />
+
+    <CheckBox
         android:id="@+id/bee_shed_switch"
         android:layout_width="0dp"
         android:layout_height="wrap_content"

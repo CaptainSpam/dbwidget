@@ -20,6 +20,7 @@ import java.util.*
 
 class DBWidgetConfigure : FragmentActivity() {
     private var beeShed = false
+    private var vintageOmega = false
 
     companion object {
         private const val DEBUG_TAG = "DBWidgetConfigure"
@@ -49,9 +50,9 @@ class DBWidgetConfigure : FragmentActivity() {
                     logo.pivotX = logo.measuredWidth * ROTATION_PIVOT_X
                     logo.pivotY = logo.measuredHeight * ROTATION_PIVOT_Y
 
-                    // Then, make sure the Rustproof Bee Shed icon is updated correctly once layout
-                    // hits.
+                    // Then, make sure the pref icons are updated correctly once layout hits.
                     updateBeeShedIcon()
+                    updateVintageOmegaIcon()
                 }
             })
         }
@@ -105,6 +106,13 @@ class DBWidgetConfigure : FragmentActivity() {
                     WidgetProvider.Companion.Prefs.BEESHED
                 ), beeShed
             )
+            this.putBoolean(
+                WidgetProvider.prefKeyFor(
+                    appWidgetId,
+                    WidgetProvider.Companion.Prefs.VINTAGEOMEGASHIFT
+                ),
+                vintageOmega
+            )
         }
 
         val appWidgetManager = AppWidgetManager.getInstance(this)
@@ -138,6 +146,12 @@ class DBWidgetConfigure : FragmentActivity() {
         }
     }
 
+    fun toggleVintageOmega(view: View) {
+        if(view is CompoundButton) {
+            vintageOmega = view.isChecked
+        }
+    }
+
     private fun updateBeeShedIcon() {
         val view = findViewById<CompoundButton>(R.id.bee_shed_switch)
 
@@ -145,6 +159,18 @@ class DBWidgetConfigure : FragmentActivity() {
             0,
             0,
             if (view.isChecked) R.drawable.pref_bee_shed_on else R.drawable.pref_bee_shed_off,
+            0
+        )
+    }
+
+    private fun updateVintageOmegaIcon() {
+        val view = findViewById<CompoundButton>(R.id.vintage_omega_switch)
+
+        view?.setCompoundDrawablesRelativeWithIntrinsicBounds(
+            0,
+            0,
+            if (view.isChecked) R.drawable.pref_vintage_omega_on
+            else R.drawable.pref_vintage_omega_off,
             0
         )
     }
