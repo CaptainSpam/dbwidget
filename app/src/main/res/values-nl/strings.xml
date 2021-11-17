@@ -17,6 +17,7 @@
     <string name="pref_bee_shed_title">Rustproof Bee Shed Modus</string>
     <string name="pref_bee_shed_on">Maakt gebruik van Beta Flight en Dusk Guard banners</string>
     <string name="pref_bee_shed_off">Maakt gebruik van Alpha Flight en Night Watch banners</string>
+    <string name="pref_vintage_omega_title">Vintage Omega Shift Banner</string>
     <string name="create_widget">Widget Aanmaken</string>
     <plurals name="hours_bussed_end">
         <item quantity="one">De bus heeft %1$d uur gereden</item>

@@ -73,17 +73,6 @@
          Shift" should be treated as a proper name.  "Vintage" can be swapped out with synonyms like
          "old", "classic", "legacy", etc. -->
     <string name="pref_vintage_omega_title">Vintage Omega Shift Banner</string>
-    <!-- Text displayed in the configure screen if the Vintage Omega Shift Banner setting is toggled
-         on.  Describes that the widget will use the older Omega Shift banner.  "Omega Shift" is a
-         proper name.  Again, "vintage" can be replaced with synonyms; use the same phrasing as in
-         pref_vintage_omega_title for consistency. -->
-    <string name="pref_vintage_omega_on">Will use vintage Omega Shift banner</string>
-    <!-- Text displayed in the configure screen if the Vintage Omega Shift Banner setting is toggled
-         off.  Describes that the widget will use the newer Omega Shift banner, with a reminder that
-         this means using the DB2021 version.  "Omega Shift" and "DB2021" are proper names.  Again,
-         "vintage" can be replaced with synonyms; use the same phrasing as in
-         pref_vintage_omega_title for consistency. -->
-    <string name="pref_vintage_omega_off">Will use newer (DB2021) Omega Shift banner</string>
 
     <!-- Label on the button in the configure screen that will create the widget with the given
          settings. -->
