@@ -220,7 +220,9 @@ class WidgetProvider : AppWidgetProvider() {
             DBShift.NIGHTWATCH -> R.drawable.dbnightwatch
             DBShift.DUSKGUARD -> R.drawable.dbduskguard
             DBShift.ZETASHIFT -> R.drawable.dbzetashift
-            DBShift.OMEGASHIFT -> R.drawable.dbomegashift
+            // TODO: Re-add once I've got translations for an option (probably for DB2022?).
+//            DBShift.OMEGASHIFT -> R.drawable.dbomegashift
+            DBShift.OMEGASHIFT -> R.drawable.dbomegashift2021
         }
 
         /** Gets the background color associated with the given shift. */
@@ -232,7 +234,9 @@ class WidgetProvider : AppWidgetProvider() {
             DBShift.NIGHTWATCH -> R.color.background_nightwatch
             DBShift.DUSKGUARD -> R.color.background_duskguard
             DBShift.ZETASHIFT -> R.color.background_zetashift
-            DBShift.OMEGASHIFT -> R.color.background_omegashift
+            // TODO: Re-add once I've got translations for an option (probably for DB2022?).
+//            DBShift.OMEGASHIFT -> R.color.background_omegashift
+            DBShift.OMEGASHIFT -> R.color.background_omegashift2021
         }
 
         /**
