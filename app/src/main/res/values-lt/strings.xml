@@ -29,4 +29,5 @@
         <item quantity="few">ŠIUO METU %1$d VALANDOS IŠ %2$d</item>
     </plurals>
     <string name="translator">Į lietuvių kalbą išvertė Onutė</string>
+    <string name="pref_vintage_omega_title">Omega režimo pradinė vėliavėlė</string>
 </resources>

@@ -29,4 +29,5 @@
         <item quantity="other">TIK TĀLU %1$d STUNDAS NO %2$d</item>
     </plurals>
     <string name="translator">Pārtulkoja Aleksandrs "Saņa" Oļeiņikovs</string>
+    <string name="pref_vintage_omega_title">Vintāžas Omega Maiņas baneris</string>
 </resources>

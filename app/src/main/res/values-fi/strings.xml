@@ -27,4 +27,5 @@
         <item quantity="other">%1$d TUNTIA %2$d TUNNISTA TÄHÄN MENESSÄ</item>
     </plurals>
     <string name="translator">Suomeksi kääntänyt Eliška Mannová</string>
+    <string name="pref_vintage_omega_title">Omegan vintagelippu</string>
 </resources>

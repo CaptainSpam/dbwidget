@@ -26,5 +26,6 @@
         <item quantity="one">%1$d HORA DE %2$d HASTA AHORA</item>
         <item quantity="other">%1$d HORAS DE %2$d HASTA AHORA</item>
     </plurals>
-    <string name="translator">Traducción al español hecha por Sara Aguirre Gª Carpintero</string>
+    <string name="translator">Traducción al español hecha por Sara Aguirre Gª Carpintero y Beth "LionHardt544"</string>
+    <string name="pref_vintage_omega_title">Bandera clásica del turno Omega</string>
 </resources>

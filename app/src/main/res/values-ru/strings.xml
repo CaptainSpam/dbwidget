@@ -31,4 +31,5 @@
         <item quantity="other">ПОКА %1$d ЧАСОВ ИЗ %2$d</item>
     </plurals>
     <string name="translator">Перевёл Алесандр "Сань" Олейников</string>
+    <string name="pref_vintage_omega_title">Винтажный баннер смены Omega</string>
 </resources>

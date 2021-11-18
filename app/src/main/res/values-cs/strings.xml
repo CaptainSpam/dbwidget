@@ -24,9 +24,10 @@
         <item quantity="other">Autobus byl na cestě %1$d hodin</item>
     </plurals>
     <plurals name="hours_bussed">
-        <item quantity="one">%1$d ZE ZATÍM %2$d HODIN</item>
-        <item quantity="few">%1$d ZE ZATÍM %2$d HODIN</item>
-        <item quantity="other">%1$d ZE ZATÍM %2$d HODIN</item>
+        <item quantity="one">%1$d. ZE ZATÍM %2$d HODIN</item>
+        <item quantity="few">%1$d. ZE ZATÍM %2$d HODIN</item>
+        <item quantity="other">%1$d. ZE ZATÍM %2$d HODIN</item>
     </plurals>
     <string name="translator">Do češtiny přeložila Eliška Mannová</string>
+    <string name="pref_vintage_omega_title">Prvotní prapor směny Omega</string>
 </resources>

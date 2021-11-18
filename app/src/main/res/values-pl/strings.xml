@@ -12,7 +12,7 @@
     <string name="acc_banner">Baner zmiany</string>
     <string name="acc_pref_bee_shed">Ikona preferencji Rustproof Bee Shed</string>
     <string name="acc_logo">Logo widżeta Desert Bus for Hope</string>
-    <string name="author">Przygotowany przez Nicholas Killewald</string>
+    <string name="author">Przygotowany przez Nicholasa Killewalda</string>
     <string name="disclaimer">(który nie jest związany z Desert Bus for Hope w jakimkolwiek oficjalnym stopniu)</string>
     <string name="pref_bee_shed_title">Tryb Rustproof Bee Shed</string>
     <string name="pref_bee_shed_on">Będą użyte banery Beta Flight oraz Dusk Guard</string>
@@ -31,4 +31,5 @@
         <item quantity="other">%1$d GODZIN Z JAK DOTĄD %2$d</item>
     </plurals>
     <string name="translator">Przetłumaczone na polski przez Łukasza Bylicę</string>
+    <string name="pref_vintage_omega_title">Klasyczny Baner Omega Shift</string>
 </resources>
