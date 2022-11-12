@@ -370,7 +370,7 @@ class WidgetProvider : AppWidgetProvider() {
                 // We always put the current donations up.
                 views.setTextViewText(
                     R.id.current_total,
-                    "\$${DecimalFormat("###,###,###,###.00").format(data.currentDonations)}"
+                    "\$${DecimalFormat("###,###,###,##0.00").format(data.currentDonations)}"
                 )
 
                 if(nowMillis > endPlusThankYouMillis(data)) {
@@ -405,11 +405,13 @@ class WidgetProvider : AppWidgetProvider() {
                         R.id.to_next_hour,
                         context.getString(
                             R.string.to_next_hour,
-                            "\$${DecimalFormat("###,###,###,###.00").format(
-                                DonationConverter.toNextHourFromDonationAmount(
-                                    data.currentDonations
+                            "\$${
+                                DecimalFormat("###,###,###,##0.00").format(
+                                    DonationConverter.toNextHourFromDonationAmount(
+                                        data.currentDonations
+                                    )
                                 )
-                            )}"
+                            }"
                         )
                     )
                 } else {
@@ -429,11 +431,13 @@ class WidgetProvider : AppWidgetProvider() {
                         R.id.to_next_hour,
                         context.getString(
                             R.string.to_next_hour,
-                            "\$${DecimalFormat("###,###,###,###.00").format(
-                                DonationConverter.toNextHourFromDonationAmount(
-                                    data.currentDonations
+                            "\$${
+                                DecimalFormat("###,###,###,##0.00").format(
+                                    DonationConverter.toNextHourFromDonationAmount(
+                                        data.currentDonations
+                                    )
                                 )
-                            )}"
+                            }"
                         )
                     )
 
