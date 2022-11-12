@@ -8,6 +8,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.text.format.DateUtils
 import android.util.Log
 import android.view.View
@@ -67,6 +68,10 @@ class WidgetProvider : AppWidgetProvider() {
             /** Corresponds to PREF_VINTAGEOMEGASHIFT. */
             VINTAGEOMEGASHIFT,
         }
+
+        /** Get the API-appropriate PendingIntent mutability flag. */
+        private fun pendingIntentMutabilityFlag(): Int =
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) PendingIntent.FLAG_IMMUTABLE else 0
 
         /** Get the key for the given pref of the given widget ID. */
         fun prefKeyFor(id: Int, pref: Prefs): String = "widget${id}${
@@ -137,7 +142,7 @@ class WidgetProvider : AppWidgetProvider() {
                         context.applicationContext,
                         0,
                         Intent(context, WidgetProvider::class.java).setAction(CHECK_ALARM_ACTION),
-                        0
+                        pendingIntentMutabilityFlag()
                     )
                 )
             } else {
@@ -167,7 +172,7 @@ class WidgetProvider : AppWidgetProvider() {
                         context.applicationContext,
                         0,
                         Intent(context, WidgetProvider::class.java).setAction(CHECK_ALARM_ACTION),
-                        0
+                        pendingIntentMutabilityFlag()
                     )
                 )
             }
@@ -186,7 +191,7 @@ class WidgetProvider : AppWidgetProvider() {
                     context.applicationContext,
                     0,
                     Intent(context, WidgetProvider::class.java).setAction(CHECK_ALARM_ACTION),
-                    0
+                    pendingIntentMutabilityFlag()
                 )
             )
         }
@@ -303,7 +308,7 @@ class WidgetProvider : AppWidgetProvider() {
                 context.applicationContext,
                 0,
                 Intent(Intent.ACTION_VIEW, Uri.parse("https://www.desertbus.org")),
-                0
+                pendingIntentMutabilityFlag()
             )
             views.setOnClickPendingIntent(R.id.widget, pendingIntent)
 
@@ -312,7 +317,7 @@ class WidgetProvider : AppWidgetProvider() {
                 context.applicationContext,
                 0,
                 Intent(context, WidgetProvider::class.java).setAction(FORCE_REFRESH),
-                0
+                pendingIntentMutabilityFlag()
             )
             views.setOnClickPendingIntent(R.id.spinner, refreshIntent)
             views.setOnClickPendingIntent(R.id.refresh, refreshIntent)
