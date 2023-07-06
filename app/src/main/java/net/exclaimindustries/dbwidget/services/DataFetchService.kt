@@ -65,6 +65,19 @@ class DataFetchService : JobIntentService() {
         /** Broadcast name for fetched data. */
         const val ACTION_DATA_FETCHED = "net.exclaimindustries.dbwidget.DATA_FETCHED"
 
+        /** JSON key for total raised. */
+        private const val JSON_TOTAL_RAISED = "Total Raised"
+        /**
+         * JSON key for the start time of the run.  If this doesn't exist, JSON_START_TIME_OLD
+         * should.
+         */
+        private const val JSON_START_TIME = "Year Start UNIX-Time"
+        /**
+         * Old JSON key for the start time of the run.  Only use this if JSON_START_TIME doesn't
+         * exist.
+         */
+        private const val JSON_START_TIME_OLD = "Year Start Actual UNIX Time"
+
         const val ERROR_GENERAL = 1
         const val ERROR_NO_NETWORK = 2
 
@@ -273,14 +286,16 @@ class DataFetchService : JobIntentService() {
 
     private fun extractStatsFromResponse(
         httpClient: HttpClient,
-        httpGet:HttpGet,
-        handler:BasicResponseHandler
+        httpGet: HttpGet,
+        handler: BasicResponseHandler
     ): FetchedStats {
         // If anything goes wrong here, just let the exception be thrown.
         val response = JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
         return FetchedStats(
-                response.getString("Total Raised").toDouble(),
-        response.getLong("Year Start Actual UNIX Time") * 1000
+            response.getString(JSON_TOTAL_RAISED).toDouble(),
+            response.getLong(
+                if (response.has(JSON_START_TIME)) JSON_START_TIME else JSON_START_TIME_OLD
+            ) * 1000
         )
     }
 
