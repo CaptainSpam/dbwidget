@@ -61,6 +61,9 @@ class WidgetProvider : AppWidgetProvider() {
         /** Pref key fragment for using the vintage Omega Shift banner. */
         private const val PREF_VINTAGEOMEGASHIFT = "VintageOmegaShift"
 
+        /** Common format for money displays on the widget. */
+        private val MONEY_FORMAT = DecimalFormat("###,###,###,##0.00")
+
         /** The known prefs. */
         enum class Prefs {
             /** Corresponds to PREF_BEESHED. */
@@ -370,7 +373,7 @@ class WidgetProvider : AppWidgetProvider() {
                 // We always put the current donations up.
                 views.setTextViewText(
                     R.id.current_total,
-                    "\$${DecimalFormat("###,###,###,##0.00").format(data.currentDonations)}"
+                    "\$${MONEY_FORMAT.format(data.currentDonations)}"
                 )
 
                 if(nowMillis > endPlusThankYouMillis(data)) {
@@ -406,7 +409,7 @@ class WidgetProvider : AppWidgetProvider() {
                         context.getString(
                             R.string.to_next_hour,
                             "\$${
-                                DecimalFormat("###,###,###,##0.00").format(
+                                MONEY_FORMAT.format(
                                     DonationConverter.toNextHourFromDonationAmount(
                                         data.currentDonations
                                     )
@@ -432,7 +435,7 @@ class WidgetProvider : AppWidgetProvider() {
                         context.getString(
                             R.string.to_next_hour,
                             "\$${
-                                DecimalFormat("###,###,###,##0.00").format(
+                                MONEY_FORMAT.format(
                                     DonationConverter.toNextHourFromDonationAmount(
                                         data.currentDonations
                                     )
