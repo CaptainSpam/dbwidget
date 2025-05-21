@@ -22,17 +22,21 @@ object ActivityTools {
      * bothering, so this will have to do for now.  Call this AFTER setContentView.
      */
     fun dealWithInsets(activity: AppCompatActivity, @IdRes id: Int) {
+        val view = activity.findViewById<View>(id)
+        val originalLayoutParams =
+            MarginLayoutParams(view.layoutParams as MarginLayoutParams)
+
         // I guess we've got insets to deal with now?  Fine, let's deal with
         // them here.
         ViewCompat.setOnApplyWindowInsetsListener(
-            activity.findViewById<View?>(id),
+            view,
             OnApplyWindowInsetsListener { v: View?, windowInsets: WindowInsetsCompat? ->
                 val insets = windowInsets!!.getInsets(WindowInsetsCompat.Type.systemBars())
                 val mlp = v!!.layoutParams as MarginLayoutParams
-                mlp.topMargin += insets.top
-                mlp.leftMargin += insets.left
-                mlp.bottomMargin += insets.bottom
-                mlp.rightMargin += insets.right
+                mlp.topMargin = originalLayoutParams.topMargin + insets.top
+                mlp.leftMargin = originalLayoutParams.leftMargin + insets.left
+                mlp.bottomMargin = originalLayoutParams.bottomMargin + insets.bottom
+                mlp.rightMargin = originalLayoutParams.rightMargin + insets.right
                 v.layoutParams = mlp
                 WindowInsetsCompat.CONSUMED
             })
