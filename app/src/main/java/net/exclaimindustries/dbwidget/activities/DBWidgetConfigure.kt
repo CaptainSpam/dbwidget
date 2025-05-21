@@ -9,16 +9,17 @@ import android.view.View
 import android.view.ViewGroup
 import android.view.ViewTreeObserver
 import android.widget.CompoundButton
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.edit
-import androidx.fragment.app.FragmentActivity
 import androidx.preference.PreferenceManager
 import net.exclaimindustries.dbwidget.R
 import net.exclaimindustries.dbwidget.services.DataFetchService
+import net.exclaimindustries.dbwidget.tools.ActivityTools
 import net.exclaimindustries.dbwidget.widgets.WidgetProvider
 import java.util.*
 
 
-class DBWidgetConfigure : FragmentActivity() {
+class DBWidgetConfigure : AppCompatActivity() {
     private var beeShed = false
     private var vintageOmega = false
 
@@ -37,6 +38,8 @@ class DBWidgetConfigure : FragmentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.configure)
+        ActivityTools.dealWithInsets(this, R.id.prefs)
+
         setResult(RESULT_CANCELED, getWidgetIntent())
 
         val vto = findViewById<ViewGroup>(R.id.prefs)?.viewTreeObserver
