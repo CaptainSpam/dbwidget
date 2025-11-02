@@ -14,7 +14,7 @@ import net.exclaimindustries.dbwidget.tools.ConnectionStateAwareApplication.Comp
 import net.exclaimindustries.dbwidget.tools.ConnectionStateAwareApplication.Companion.ConnectivityEventLiveData
 import net.exclaimindustries.dbwidget.util.DonationConverter
 import net.exclaimindustries.dbwidget.widgets.WidgetProvider
-import org.json.JSONArray
+import org.json.JSONObject
 import java.util.*
 
 /**
@@ -33,7 +33,7 @@ class DataFetchService : JobIntentService() {
         private const val URL_PREFIX = "https://vst.ninja/"
 
         /** URL to get the stats.  Replace "<YEAR>" with the actual numbered DB. */
-        private const val STATS_URL_BASE = "${URL_PREFIX}DB<YEAR>/data/DB<YEAR>_stats.json"
+        private const val STATS_URL_BASE = "${URL_PREFIX}DB<YEAR>/data/DB<YEAR>_stats_v2.json"
 
         /** URL to tell if it's Omega Shift. */
         private const val OMEGA_CHECK_URL = "${URL_PREFIX}Resources/isitomegashift.html"
@@ -65,18 +65,21 @@ class DataFetchService : JobIntentService() {
         /** Broadcast name for fetched data. */
         const val ACTION_DATA_FETCHED = "net.exclaimindustries.dbwidget.DATA_FETCHED"
 
+        /** JSON key for all stats (as opposed to definitions). */
+        private const val JSON_STATS_CATEGORY = "Stats"
+
+        /** JSON key for donation data. */
+        private const val JSON_DONATION_DATA_CATEGORY = "Donation Data"
         /** JSON key for total raised. */
         private const val JSON_TOTAL_RAISED = "Total Raised"
+
+        /** JSON key for the Year Data category. */
+        private const val JSON_YEAR_DATA_CATEGORY = "Year Data"
         /**
          * JSON key for the start time of the run.  If this doesn't exist, JSON_START_TIME_OLD
          * should.
          */
         private const val JSON_START_TIME = "Year Start UNIX-Time"
-        /**
-         * Old JSON key for the start time of the run.  Only use this if JSON_START_TIME doesn't
-         * exist.
-         */
-        private const val JSON_START_TIME_OLD = "Year Start Actual UNIX Time"
 
         const val ERROR_GENERAL = 1
         const val ERROR_NO_NETWORK = 2
@@ -290,12 +293,16 @@ class DataFetchService : JobIntentService() {
         handler: BasicResponseHandler
     ): FetchedStats {
         // If anything goes wrong here, just let the exception be thrown.
-        val response = JSONArray(httpClient.execute(httpGet, handler)).getJSONObject(0)
+        val response = JSONObject(httpClient.execute(httpGet, handler)).getJSONObject(JSON_STATS_CATEGORY)
         return FetchedStats(
-            response.getString(JSON_TOTAL_RAISED).toDouble(),
-            response.getLong(
-                if (response.has(JSON_START_TIME)) JSON_START_TIME else JSON_START_TIME_OLD
-            ) * 1000
+            response
+                .getJSONObject(JSON_DONATION_DATA_CATEGORY)
+                .getString(JSON_TOTAL_RAISED)
+                .toDouble(),
+            response
+                .getJSONObject(JSON_YEAR_DATA_CATEGORY)
+                .getLong(JSON_START_TIME)
+                    * 1000
         )
     }
 
